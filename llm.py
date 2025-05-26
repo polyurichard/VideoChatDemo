@@ -9,11 +9,23 @@ class LLMService:
                 openai_api_version="2024-02-15-preview",  azure_deployment="gpt-4o-mini",
                 temperature = 0, streaming = False, json_mode = False):
 
-        # Load the API key and endpoint from the configuration file
-        config = toml.load(config_path)
-        # Set the environment variables for the Azure OpenAI endpoint and API key
-        os.environ["AZURE_OPENAI_ENDPOINT"] = config["AZURE_OPENAI"]["AZURE_OPENAI_ENDPOINT"]
-        os.environ["AZURE_OPENAI_API_KEY"] = config["AZURE_OPENAI"]["AZURE_OPENAI_API_KEY"]
+        # Try to load the API key and endpoint from the configuration file
+        try:
+            config = toml.load(config_path)
+            # Set the environment variables for the Azure OpenAI endpoint and API key
+            os.environ["AZURE_OPENAI_ENDPOINT"] = config["AZURE_OPENAI"]["AZURE_OPENAI_ENDPOINT"]
+            os.environ["AZURE_OPENAI_API_KEY"] = config["AZURE_OPENAI"]["AZURE_OPENAI_API_KEY"]
+        except (FileNotFoundError, toml.TomlDecodeError):
+            # Try to load config from Streamlit secrets if available
+            try:
+                import streamlit as st
+                if hasattr(st, 'secrets') and "AZURE_OPENAI" in st.secrets:
+                    os.environ["AZURE_OPENAI_ENDPOINT"] = st.secrets["AZURE_OPENAI"]["AZURE_OPENAI_ENDPOINT"]
+                    os.environ["AZURE_OPENAI_API_KEY"] = st.secrets["AZURE_OPENAI"]["AZURE_OPENAI_API_KEY"]
+                else:
+                    raise ImportError("Streamlit secrets not configured with AZURE_OPENAI credentials")
+            except ImportError as e:
+                raise ValueError(f"Configuration not found. Either provide a valid config file or run in a Streamlit environment with proper secrets configuration. Error: {str(e)}")
 
         model_kwargs = {}
         if json_mode:

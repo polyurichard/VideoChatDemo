@@ -1,6 +1,5 @@
 Here are the features of the two mode of flipped learning app.
-1. Discussion mode: The chatbot will engage the student in a discussion/explaination about the topic, asking questions and providing explanations based on the video content. The chatbot will ask for clarification and encourage the student to explore deeper about the topic.
-2. Questioning mode: The chatbot will ask a set of questions related to the topic, which can be short questions, multiple-choice, or reflective question. For each question, 3 hints will be provided, along with a model answer and an explanation. The student must answer pre-defined minimum number of questions correctly to complete the topic. The instructors can define the type of questions that will be generated and the number of questions that the student should correctly answer to complete the topic. For multiple choice questions, the instructor can configure whether the chatbot should ask the student to explain their choice before providing feedback or moving to the next question.
+1.  The chatbot will ask a set of questions related to the topic, which can be short questions, multiple-choice, or reflective question. For each question, 3 hints will be provided, along with a model answer and an explanation. The student must answer pre-defined minimum number of questions correctly to complete the topic. The instructors can define the type of questions that will be generated and the number of questions that the student should correctly answer to complete the topic. For multiple choice questions, the instructor can configure whether the chatbot should ask the student to explain their choice before providing feedback or moving to the next question.
 
 For each topic, outuput the topic name, learning objective, timestamp, detailed content of the topic. 
 Also generate the discussion items and various types of questions (3 mcq, 2 short questions, 2 reflective questions for each topic) based on the video transcript provided below.
@@ -9,13 +8,25 @@ Each discussion item should provide and sample answer
 For each question assign a point value (e.g., 1 point for mcq, 2 points for short questions, 3 points for reflective questions, 2 points for each discusson item). Each question or discuss item should output the question, point value, and sample answer, and the reference timestamp in the video transcript that contain the answer to the question. Each question should provide 3 hints, correct answer and explanation of the correct answer.
 
 
+Requirements:
+-  The first 3 topics has a field which indicates it's "Required = True", while the other required=false.
+- For each topic, generate 6 questions. The first 3 questions is core while the other are optional
+- For each topic, there will be core questions that user should complete.
+Core questions:
+- the first core question should be a discussion item (there is no answer but a rubric for evaluation), which means that it does not have right or wrong answer. E.g. ask which technology is most useful to student.
+question 2 will be mcq questions
+- question 4 will be reflective question on the topic.
+- Other questions should be optional questions.
+- Each topic name should be 4-5 words
+- 
+
+
 # Output in Json Format without ```json
 Fields:
 Topic 1: Introduction to Machine Learning and Use Case
 Learning objectives: ...
 Timestamp: ...
 Video summary: ...
-Discussion Items:
 Questions:
 
 Example:
@@ -23,6 +34,7 @@ Example:
   "topics": [
     {
       "title": "Introduction to Machine Learning Applications",
+      "required": true, # indicates this topic is core topic
       "learning_objectives": [
         "Identify various applications of machine learning in real-world scenarios",
         "Explain how machine learning enhances computer capabilities"
@@ -37,86 +49,31 @@ Example:
           "timestamp": "00:20",
           "content": "Machine learning empowers systems to perform complex tasks beyond traditional programming."
         }
-      ],
-      "discussion_items": [
-        {
-          "question": "What are some examples of machine learning applications mentioned in the video?",
-          "point_value": 2,
-          "sample_answer": "Examples include detecting skin cancer, sorting cucumbers, and detecting escalators in need of repair.",
-          "reference_timestamp": "00:01",
-          "hints": [
-            "Think about healthcare and agriculture.",
-            "Consider maintenance tasks.",
-            "Machine learning enables new computer abilities."
-          ]
-        },
-        {
-          "question": "How does machine learning enhance computer systems according to the video?",
-          "point_value": 2,
-          "sample_answer": "It grants computer systems new abilities to perform complex tasks that traditional programming cannot easily handle.",
-          "reference_timestamp": "00:20",
-          "hints": [
-            "It allows computers to learn from data.",
-            "It improves task performance.",
-            "It goes beyond fixed rules."
-          ]
-        }
-      ],
+      ]
       "questions": [
         {
+          "type": "discussion",
+          "required": true,
+          "question": "What are some real-world applications of machine learning that you find most interesting?",
+          "point_value": 2,
+          "evaluation_criteria": "Discuss the applications mentioned in the video and any additional ones you know.",
+        }
+        {
           "type": "mcq",
+          "required": true
           "question": "Which of the following is NOT mentioned as an application of machine learning?",
           "point_value": 1,
           "options": ["Detecting skin cancer", "Sorting cucumbers", "Detecting escalators needing repair", "Playing chess"],
           "correct_answer": "Playing chess",
           "explanation": "The video mentions detecting skin cancer, sorting cucumbers, and escalator repair but does not mention playing chess.",
           "hints": [
-            "Recall the examples given at the start.",
-            "Think about physical object detection.",
-            "Chess is not referenced in this video segment."
+            "You may review the video at timestamp ...",
+            ...
           ],
           "reference_timestamp": "00:01"
         },
         {
-          "type": "mcq",
-          "question": "What does machine learning enable computer systems to do?",
-          "point_value": 1,
-          "options": [
-            "Perform simple calculations",
-            "Perform complex tasks and gain new abilities",
-            "Only follow fixed instructions",
-            "Operate without data"
-          ],
-          "correct_answer": "Perform complex tasks and gain new abilities",
-          "explanation": "Machine learning allows systems to learn from data and perform complex tasks beyond fixed instructions.",
-          "hints": [
-            "Think about 'new abilities'.",
-            "It involves learning, not just instructions.",
-            "Data is key to machine learning."
-          ],
-          "reference_timestamp": "00:20"
-        },
-        {
-          "type": "mcq",
-          "question": "Machine learning is described as a process that works 'under the hood' to:",
-          "point_value": 1,
-          "options": [
-            "Manually program every task",
-            "Get answers from data",
-            "Replace all human jobs",
-            "Work without any training"
-          ],
-          "correct_answer": "Get answers from data",
-          "explanation": "The video emphasizes machine learning as a way to extract answers from data automatically.",
-          "hints": [
-            "Focus on 'getting answers'.",
-            "Manual programming is not the focus.",
-            "Training is necessary."
-          ],
-          "reference_timestamp": "00:01"
-        },
-        {
-          "type": "short",
+          "type": "short", # short question
           "question": "Why is machine learning important in real-world applications?",
           "point_value": 2,
           "sample_answer": "Because it allows computer systems to perform tasks that are difficult to program manually by learning from data.",
@@ -127,20 +84,7 @@ Example:
             "It enables automation."
           ],
           "reference_timestamp": "00:01-00:20"
-        },
-        {
-          "type": "short",
-          "question": "Give two examples of tasks machine learning can perform mentioned in the video.",
-          "point_value": 2,
-          "sample_answer": "Detecting skin cancer and sorting cucumbers.",
-          "explanation": "These examples were explicitly mentioned as applications of machine learning.",
-          "hints": [
-            "One is medical-related.",
-            "One is agricultural-related.",
-            "Both involve classification."
-          ],
-          "reference_timestamp": "00:01"
-        },
+        }
         {
           "type": "reflective",
           "question": "How might machine learning change traditional approaches to problem-solving in technology?",
@@ -153,19 +97,6 @@ Example:
             "Reflect on the complexity of tasks."
           ],
           "reference_timestamp": "00:20"
-        },
-        {
-          "type": "reflective",
-          "question": "Why do you think machine learning applications span such diverse fields like healthcare, agriculture, and maintenance?",
-          "point_value": 3,
-          "sample_answer": "Because machine learning’s ability to analyze data and detect patterns is a versatile tool that can be adapted to solve many different kinds of problems across various domains.",
-          "explanation": "The fundamental principle of learning from data applies broadly, making it useful in many sectors.",
-          "hints": [
-            "Think about pattern detection.",
-            "Consider data diversity.",
-            "Reflect on problem-solving flexibility."
-          ],
-          "reference_timestamp": "00:01"
         }
       ]
     },

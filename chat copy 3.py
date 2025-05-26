@@ -81,27 +81,20 @@ def get_discussion_prompt():
     if selected_topic_data is None and len(all_topics.get("topics", [])) > 0:
         # Extract transcript for first topic
         first_topic = all_topics["topics"][0]
-        
-        # Get end timestamp with a default value (next topic's start time or None)
-        end_timestamp = first_topic.get("end_timestamp")
-        if end_timestamp is None and len(all_topics["topics"]) > 1:
-            # If no end timestamp and there's a next topic, use next topic's start time
-            end_timestamp = all_topics["topics"][1].get("start_timestamp")
-        
         transcript_text = extract_transcript(
             "sample-data/transcript.txt", 
             first_topic["start_timestamp"], 
-            end_timestamp
+            first_topic["end_timestamp"]
         )
         
         selected_topic_data = {
             "title": first_topic["title"],
-            "required": first_topic.get("required", False),
             "learning_objectives": first_topic.get("learning_objectives", []),
             "start_timestamp": first_topic.get("start_timestamp", ""),
             "end_timestamp": first_topic.get("end_timestamp", ""),
             "detailed_content": first_topic.get("detailed_content", []),
             "questions": first_topic.get("questions", []),
+            "discussion_items": first_topic.get("discussion_items", []),
             "transcript": transcript_text
         }
     
@@ -133,26 +126,22 @@ def get_topics():
 
 
 def calculate_total_points(topic_data):
-    """Calculate the points for a given topic.
-    Returns a tuple of (core_points, total_points) where:
-    - core_points: Sum of points for required questions
-    - total_points: Sum of points for all questions (core + optional)
-    """
-    core_points = 0
+    """Calculate the total available points for a given topic."""
     total_points = 0
     
     # Add points from questions
     if "questions" in topic_data:
         for question in topic_data["questions"]:
             if "point_value" in question:
-                point_value = question["point_value"]
-                total_points += point_value
-                
-                # Only add to core points if question is required
-                if question.get("required", False):
-                    core_points += point_value
+                total_points += question["point_value"]
     
-    return (core_points, total_points)
+    # Add points from discussion items
+    if "discussion_items" in topic_data:
+        for item in topic_data["discussion_items"]:
+            if "point_value" in item:
+                total_points += item["point_value"]
+    
+    return total_points
 
 def update_topic_points(topic_title):
     """Update the points earned for a topic based on LLM evaluation of answers."""
@@ -246,18 +235,14 @@ def update_topic_points(topic_title):
             st.session_state.topic_total_points.get(topic_title, 100)  # Cap at max points
         )
         
-        # Check if this is a core topic and if all core questions are answered
+        # Check if this topic is now completed (2+ points)
         new_points = st.session_state.topic_points[topic_title]
-        core_points = st.session_state.topic_core_points.get(topic_title, 0)
-        is_required = st.session_state.selected_topic_data.get("required", False)
-        
-        # Topic is completed if it's earned at least as many points as core questions are worth
-        if is_required and current_points < core_points and new_points >= core_points:
-            # This core topic just became completed
+        if current_points < 2 and new_points >= 2:
+            # This topic just became completed
             st.session_state.completed_topics_count += 1
         
-        print(f"Updated points for {topic_title}: {new_points}/{st.session_state.topic_core_points.get(topic_title, 0)} (core) - {st.session_state.topic_total_points.get(topic_title, 100)} (total)")
-        print(f"Completed core topics: {st.session_state.completed_topics_count}/{len(core_topics)}")
+        print(f"Updated points for {topic_title}: {new_points}/{st.session_state.topic_total_points.get(topic_title, 100)}")
+        print(f"Completed topics: {st.session_state.completed_topics_count}/{len(topics)}")
 
 
 
@@ -267,25 +252,15 @@ all_topics = get_topics()
 # Create a dictionary mapping topics to their timestamps
 topics = []
 topic_timestamps = {}
-topic_core_points = {}
 topic_total_points = {}
-core_topics = []
 
 for i in all_topics["topics"]:
     title = i["title"]
     start_time = i["start_timestamp"]
-    is_required = i.get("required", False)
-    
     topics.append(title)
     topic_timestamps[title] = start_time
-    
-    # Calculate core and total points for each topic
-    core_points, total_points = calculate_total_points(i)
-    topic_core_points[title] = core_points
-    topic_total_points[title] = total_points
-    
-    if is_required:
-        core_topics.append(title)
+    # Calculate total points for each topic
+    topic_total_points[title] = calculate_total_points(i)
 
 # Initialize topic progress if not in session state
 if "topic_progress" not in st.session_state:
@@ -295,10 +270,7 @@ if "topic_progress" not in st.session_state:
 if "topic_points" not in st.session_state:
     st.session_state.topic_points = {topic: 0 for topic in topics}
 
-# Store points for reference
-if "topic_core_points" not in st.session_state:
-    st.session_state.topic_core_points = topic_core_points
-    
+# Store total points for reference
 if "topic_total_points" not in st.session_state:
     st.session_state.topic_total_points = topic_total_points
 
@@ -308,29 +280,22 @@ if "selected_topic_data" not in st.session_state:
     # Auto-select the first topic when page loads if no topic is selected
     if len(all_topics.get("topics", [])) > 0:
         first_topic = all_topics["topics"][0]
-        
-        # Get end timestamp with a default value (next topic's start time or None)
-        end_timestamp = first_topic.get("end_timestamp")
-        if end_timestamp is None and len(all_topics["topics"]) > 1:
-            # If no end timestamp and there's a next topic, use next topic's start time
-            end_timestamp = all_topics["topics"][1].get("start_timestamp")
-        
         # Extract transcript for first topic
         transcript_text = extract_transcript(
             "sample-data/transcript.txt", 
             first_topic["start_timestamp"], 
-            end_timestamp
+            first_topic["end_timestamp"]
         )
         
         # Store all relevant topic data including title, objectives, timestamps, and content
         st.session_state.selected_topic_data = {
             "title": first_topic["title"],
-            "required": first_topic.get("required", False),
             "learning_objectives": first_topic.get("learning_objectives", []),
             "start_timestamp": first_topic.get("start_timestamp", ""),
             "end_timestamp": first_topic.get("end_timestamp", ""),
             "detailed_content": first_topic.get("detailed_content", []),
             "questions": first_topic.get("questions", []),
+            "discussion_items": first_topic.get("discussion_items", []),
             "transcript": transcript_text
         }
 
@@ -390,31 +355,26 @@ def store_topic_data(topic_title):
     # clear conversation history
     st.session_state.messages = []
 
+
     # Find the topic data in all_topics
-    for i, topic in enumerate(all_topics["topics"]):
+    for topic in all_topics["topics"]:
         if topic["title"] == topic_title:
-            # Get end timestamp with a default value (next topic's start time or None)
-            end_timestamp = topic.get("end_timestamp")
-            if end_timestamp is None and i < len(all_topics["topics"]) - 1:
-                # If no end timestamp and there's a next topic, use next topic's start time
-                end_timestamp = all_topics["topics"][i+1].get("start_timestamp")
-            
             # Extract transcript for this topic
             transcript_text = extract_transcript(
                 "sample-data/transcript.txt", 
                 topic["start_timestamp"], 
-                end_timestamp
+                topic["end_timestamp"]
             )
             
             # Store all relevant topic data including title, objectives, timestamps, and content
             st.session_state.selected_topic_data = {
                 "title": topic["title"],
-                "required": topic.get("required", False),
                 "learning_objectives": topic.get("learning_objectives", []),
                 "start_timestamp": topic.get("start_timestamp", ""),
                 "end_timestamp": topic.get("end_timestamp", ""),
                 "detailed_content": topic.get("detailed_content", []),
                 "questions": topic.get("questions", []),
+                "discussion_items": topic.get("discussion_items", []),
                 "transcript": transcript_text
             }
             
@@ -436,13 +396,12 @@ with st.sidebar:
     with metrics_cols[2]:
         st.metric("Answers", st.session_state.correct_answers_count)
     with metrics_cols[3]:
-        core_topics_count = len(core_topics)
-        st.metric("Core Topics Completed", f"{st.session_state.completed_topics_count}/{core_topics_count}")
+        st.metric("Completed", st.session_state.completed_topics_count)
     
     # Topic Dashboard Panel (now collapsible with expander)
     with st.expander("Progress", expanded=True):
         # Create clickable topic table
-        col1, col2, col3, col4 = st.columns([1, 3, 1, 1])
+        col1, col2, col3 = st.columns([1, 3, 1])
         
         with col1:
             st.subheader("Start")
@@ -451,29 +410,19 @@ with st.sidebar:
             st.subheader("Topics")
         
         with col3:
-            st.subheader("Status")
-            
-        with col4:
             st.subheader("Progress")
           # Display each topic with progress and link in table rows
-        for topic_idx, topic_data in enumerate(all_topics["topics"]):
-            topic = topic_data["title"]
-            is_required = topic_data.get("required", False)
+        for topic in topics:
             timestamp = topic_timestamps.get(topic, 0)
             points_earned = st.session_state.topic_points.get(topic, 0)
-            core_points = st.session_state.topic_core_points.get(topic, 0)
             total_points = st.session_state.topic_total_points.get(topic, 1)
             
-            # Calculate progress as percentage of points earned compared to core points
-            if core_points > 0:
-                progress_pct = min(100, int((points_earned / core_points) * 100))
-            else:
-                progress_pct = 100 if points_earned > 0 else 0
-                
+            # Calculate progress as percentage of points earned
+            progress_pct = int((points_earned / total_points) * 100) if total_points > 0 else 0
             st.session_state.topic_progress[topic] = progress_pct
             
             # Create a row for each topic
-            cols = st.columns([1, 3, 1, 1])
+            cols = st.columns([1, 3, 1])
             
             # First column: Start button with emoji
             with cols[0]:
@@ -495,27 +444,14 @@ with st.sidebar:
                     args=(timestamp,)
                 )
             
-            # Third column: Required/Optional status
+            # Third column: Points progress
             with cols[2]:
-                status_label = "🔷 Core" if is_required else "◻️ Optional"
-                st.write(status_label)
-            
-            # Fourth column: Points progress
-            with cols[3]:
                 # Show both points and emoji indicator
                 points_earned = st.session_state.topic_points.get(topic, 0)
-                core_points = st.session_state.topic_core_points.get(topic, 0)
-                
-                # A topic is completed when all core questions are answered (points >= core_points)
-                completed = points_earned >= core_points if core_points > 0 else points_earned > 0
-                emoji_indicator = "✅" if completed else "⏳"
-                
-                # Display points as: earned/core (total)
-                if core_points < total_points:
-                    st.write(f"{points_earned}/{core_points} {emoji_indicator}")
-                else:
-                    # If all questions are core, just show as earned/total
-                    st.write(f"{points_earned}/{total_points} {emoji_indicator}")
+                total_points = st.session_state.topic_total_points.get(topic, 1)
+                # Changed completion threshold to 2 points
+                emoji_indicator = "✅" if points_earned >= 2 else "⏳"
+                st.write(f"{points_earned}/{total_points} {emoji_indicator}")
     
     # Add YouTube video with timestamp
     if "selected_timestamp" in st.session_state:
@@ -534,10 +470,9 @@ def display_topic_details():
         
     # Display selected topic data at the top of the main content area
     if st.session_state.selected_topic_data:
-        required_status = "Core" if st.session_state.selected_topic_data.get("required", False) else "Optional"
-        with st.expander(f"Topic: {st.session_state.selected_topic_data['title']} ({required_status})", expanded=False):
-            # Add tabs for different content
-            tab1, tab2, tab3, tab4 = st.tabs(["Overview", "Questions", "Transcript", "Discussion Prompt"])
+        with st.expander(f"Topic: {st.session_state.selected_topic_data['title']}", expanded=False):
+            # Add tabs for different content, including a new "Discussion Prompt" tab
+            tab1, tab2, tab3, tab4, tab5 = st.tabs(["Overview", "Questions", "Discussion Items", "Transcript", "Discussion Prompt"])
             
             with tab1:
                 # Display topic overview information
@@ -557,14 +492,9 @@ def display_topic_details():
                     st.write(f"**({timestamp})** {content}")
             
             with tab2:
-                # Create two columns for Required and Optional questions
-                required_questions = [q for q in st.session_state.selected_topic_data.get("questions", []) if q.get("required", False)]
-                optional_questions = [q for q in st.session_state.selected_topic_data.get("questions", []) if not q.get("required", False)]
-                
-                # Display required questions first with a header
-                if required_questions:
-                    st.subheader("Core Questions")
-                    for i, question in enumerate(required_questions):
+                # Display questions
+                if st.session_state.selected_topic_data.get("questions"):
+                    for i, question in enumerate(st.session_state.selected_topic_data["questions"]):
                         q_type = question.get("type", "Unknown")
                         st.write(f"**{q_type.capitalize()} Question {i+1}:** {question['question']}")
                         st.write(f"Points: {question['point_value']}")
@@ -584,7 +514,7 @@ def display_topic_details():
                             st.radio(
                                 f"Options for Q{i+1}", 
                                 options, 
-                                key=f"req_question_{i}",
+                                key=f"question_{i}",
                                 index=default_index  # Pre-select correct answer
                             )
                             
@@ -606,73 +536,43 @@ def display_topic_details():
                             for hint in question["hints"]:
                                 st.write(f"- {hint}")
                         
-                        # Add reference timestamp if available
-                        if "reference_timestamp" in question:
-                            st.write(f"**Reference:** {question['reference_timestamp']}")
-                            
                         # Add separator between questions
-                        st.markdown("---")
-
-                # Then display optional questions
-                if optional_questions:
-                    st.subheader("Optional Questions")
-                    for i, question in enumerate(optional_questions):
-                        q_type = question.get("type", "Unknown")
-                        st.write(f"**{q_type.capitalize()} Question {i+1}:** {question['question']}")
-                        st.write(f"Points: {question['point_value']}")
-                        
-                        # Same display logic for optional questions
-                        if q_type == "mcq" and "options" in question:
-                            options = question["options"]
-                            default_index = 0
-                            if "correct_answer" in question:
-                                try:
-                                    default_index = options.index(question["correct_answer"])
-                                except ValueError:
-                                    default_index = 0
-                            
-                            st.radio(
-                                f"Options for Q{i+1}", 
-                                options, 
-                                key=f"opt_question_{i}",
-                                index=default_index
-                            )
-                            
-                            if "correct_answer" in question:
-                                st.success(f"**Correct Answer:** {question['correct_answer']}")
-                                if "explanation" in question:
-                                    st.info(f"**Explanation:** {question['explanation']}")
-                        else:
-                            if "sample_answer" in question:
-                                st.success(f"**Sample Answer:** {question['sample_answer']}")
-                                if "explanation" in question:
-                                    st.info(f"**Explanation:** {question['explanation']}")
-                        
-                        if "hints" in question:
-                            st.markdown("**Hints:**")
-                            for hint in question["hints"]:
-                                st.write(f"- {hint}")
-                        
-                        if "reference_timestamp" in question:
-                            st.write(f"**Reference:** {question['reference_timestamp']}")
-                            
                         st.markdown("---")
             
             with tab3:
+                # Display discussion items
+                if st.session_state.selected_topic_data.get("discussion_items"):
+                    for i, item in enumerate(st.session_state.selected_topic_data["discussion_items"]):
+                        st.write(f"**Question {i+1}:** {item['question']}")
+                        st.write(f"Points: {item['point_value']}")
+                        
+                        # Show sample answer automatically without toggle button
+                        if "sample_answer" in item:
+                            st.success(f"**Sample Answer:** {item['sample_answer']}")
+                        
+                        # Add hints directly without toggle button
+                        if "hints" in item:
+                            st.markdown("**Hints:**")
+                            for hint in item["hints"]:
+                                st.write(f"- {hint}")
+                        
+                        # Add separator between discussion items
+                        st.markdown("---")
+            with tab4:
                 # Display transcript
                 if "transcript" in st.session_state.selected_topic_data:
                     st.markdown("### Transcript")
                     st.text_area("Transcript", st.session_state.selected_topic_data["transcript"], 
                                 height=300, key="transcript_text", disabled=True, label_visibility="collapsed")
             
-            with tab4:
-                # Display the discussion prompt as plain text
+            with tab5:            # Display the discussion prompt as plain text instead of markdown
                 st.markdown("### Discussion Prompt")
                 st.markdown("This is the prompt used by the AI to guide discussion about this topic:")
                 
+                # Using text_area to display the prompt as plain text
                 st.text_area("Discussion Prompt", st.session_state.discussion_prompt, 
                             height=400, key="discussion_prompt_text", disabled=True, label_visibility="collapsed")    
-
+            
 # Add a button to start a discussion with this prompt
 # Print current topic
 
@@ -790,30 +690,27 @@ def update_topic_points(topic_title):
             st.session_state.topic_total_points.get(topic_title, 100)  # Cap at max points
         )
         
-        # Check if this is a core topic and if all core questions are answered
+        # Check if this topic is now completed (2+ points)
         new_points = st.session_state.topic_points[topic_title]
-        core_points = st.session_state.topic_core_points.get(topic_title, 0)
-        is_required = st.session_state.selected_topic_data.get("required", False)
-        
-        # Topic is completed if it's earned at least as many points as core questions are worth
-        if is_required and current_points < core_points and new_points >= core_points:
-            # This core topic just became completed
+        if current_points < 2 and new_points >= 2:
+            # This topic just became completed
             st.session_state.completed_topics_count += 1
         
-        print(f"Updated points for {topic_title}: {new_points}/{st.session_state.topic_core_points.get(topic_title, 0)} (core) - {st.session_state.topic_total_points.get(topic_title, 100)} (total)")
-        print(f"Completed core topics: {st.session_state.completed_topics_count}/{len(core_topics)}")
+        print(f"Updated points for {topic_title}: {new_points}/{st.session_state.topic_total_points.get(topic_title, 100)}")
+        print(f"Completed topics: {st.session_state.completed_topics_count}/{len(topics)}")
 
 
 def start_exercise():
     st.session_state.start_exercise_clicked = True
     print("Start exercise button clicked")  # Debugging line
-    
+    st.write("Starting exercise...")  # Debugging line
 
 
 
 # handle the start exercise button click
 if "start_exercise_clicked" in st.session_state:
-    user_input = "Let's start the practice session."
+    st.write("Start MCQ")  # Debugging line
+    user_input = "Let's start the MCQ practice session."
     st.session_state.messages.append({"role": "user", "content": user_input})
 
     formatted_messages = []
@@ -833,8 +730,7 @@ if "start_exercise_clicked" in st.session_state:
 
 
 
-st.subheader("Topic: " + st.session_state.selected_topic_data.get("title", "No Topic Selected") + 
-             (" (Core)" if st.session_state.selected_topic_data.get("required", False) else " (Optional)"))
+st.subheader("Topic: " + st.session_state.selected_topic_data.get("title", "No Topic Selected"))
 display_topic_details()
 start_button = st.button("Start Discussion", key="start_discussion_btn", on_click = start_chat)
 
@@ -880,4 +776,4 @@ if "messages" in st.session_state and len(st.session_state.messages) > 0:
 
 
 
-    start_exercise = st.button("Start Practice", key="start_exercise_btn", on_click=start_exercise)
+    start_exercise = st.button("Start MCQ", key="start_exercise_btn", on_click=start_exercise)

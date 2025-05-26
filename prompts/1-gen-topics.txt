@@ -5,7 +5,6 @@ explain in easy to understand manner the contents of the video.
 Each bullet point should prefix with a starting timestamp to the corresponding content if available
 There should be at most 5 topics and number of words in topic is at most 4 words.
 
-
 Output in JSON without ```json. Example:
 {
   "topics": [
