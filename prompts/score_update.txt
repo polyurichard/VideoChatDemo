@@ -1,0 +1,24 @@
+based on the last messages between the user and the assistant, determine if the user has answered the bot correctly and the AI award points accordingly.
+
+Based user_conversation below,  classify whether the user is asking a question to AI, the user is answering a question from the AI, or the user input is something else
+Output the number of points the user should receive based on the following criteria:
+
+<user_conversation>
+{conversation}
+</user_conversation>
+
+Output a json object without ```json. Fields:
+- think: first think about the intent of user and whether the user has provided a good explanation to his answer before awarding score.
+- user_input_classification: 
+    - "answer": if the user is answering the question from the AI and either receive or not receive a score from the AI.
+    - "question": if the user is asking a question to the AI.
+    - "hint": if the user is asking for a hint to answer the question.
+    - "others": other user input that is not a question or answer.
+- score: if user is answering question, provide an integer representing the score the user should receive. if no score is awared give 0 of user is not asking a question, return 0 
+
+Example output:
+{{
+  "think": "..."
+  "user_input_classification": "answer",
+  "score": (integer representing the score the user should receive)
+}}

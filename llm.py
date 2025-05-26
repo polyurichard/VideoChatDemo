@@ -1,0 +1,44 @@
+import os, toml
+from langchain_openai import AzureChatOpenAI
+from langchain_core.output_parsers import *
+from langchain_core.prompts import ChatPromptTemplate
+
+class LLMService:
+    # constructor
+    def __init__(self, config_path=".env",
+                openai_api_version="2024-02-15-preview",  azure_deployment="gpt-4o-mini",
+                temperature = 0, streaming = False, json_mode = False):
+
+        # Load the API key and endpoint from the configuration file
+        config = toml.load(config_path)
+        # Set the environment variables for the Azure OpenAI endpoint and API key
+        os.environ["AZURE_OPENAI_ENDPOINT"] = config["AZURE_OPENAI"]["AZURE_OPENAI_ENDPOINT"]
+        os.environ["AZURE_OPENAI_API_KEY"] = config["AZURE_OPENAI"]["AZURE_OPENAI_API_KEY"]
+
+        model_kwargs = {}
+        if json_mode:
+            model_kwargs = {"response_format": {"type": "json_object"}}
+                    
+        # Initialize the AzureChatOpenAI instance
+        self.llm = AzureChatOpenAI(
+            openai_api_version = openai_api_version,
+            azure_deployment = azure_deployment,
+            temperature = temperature,
+            streaming = streaming,
+            model_kwargs = model_kwargs
+        )
+    
+    def getLLM(self):
+        return self.llm
+    
+    def send_message(self, messages):
+        prompt_template = ChatPromptTemplate.from_messages(messages) 
+        chain = prompt_template| self.llm | StrOutputParser() #JsonOutputParser()
+        output = chain.invoke({})
+        return output
+
+# if main program, run the LLM
+if __name__ == "__main__":    
+    llm = LLMService()
+    result=llm.send_message(["Hello, how are you?"])
+    print(result)
