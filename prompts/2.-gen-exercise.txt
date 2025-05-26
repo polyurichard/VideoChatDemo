@@ -1,7 +1,7 @@
 Here are the features of the two mode of flipped learning app.
 1.  The chatbot will ask a set of questions related to the topic, which can be short questions, multiple-choice, or reflective question. For each question, 3 hints will be provided, along with a model answer and an explanation. The student must answer pre-defined minimum number of questions correctly to complete the topic. The instructors can define the type of questions that will be generated and the number of questions that the student should correctly answer to complete the topic. For multiple choice questions, the instructor can configure whether the chatbot should ask the student to explain their choice before providing feedback or moving to the next question.
 
-For each topic, outuput the topic name, learning objective, timestamp, detailed content of the topic. 
+For each topic, outuput the topic name, detailed topic summary, timestamp,
 Also generate the discussion items and various types of questions (3 mcq, 2 short questions, 2 reflective questions for each topic) based on the video transcript provided below.
 For discussion item, it short start from simple questions to more complex question.
 Each discussion item should provide and sample answer 
@@ -22,10 +22,6 @@ question 2 will be mcq questions
 
 
 # Output in Json Format without ```json
-Fields:
-Topic 1: Introduction to Machine Learning and Use Case
-Learning objectives: ...
-...
 
 Example:
 {
@@ -33,22 +29,9 @@ Example:
     {
       "title": "Introduction to Machine Learning Applications",
       "required": true, # indicates this topic is core topic
-      "learning_objectives": [
-        "Identify various applications of machine learning in real-world scenarios",
-        "Explain how machine learning enhances computer capabilities"
-      ],
       "start_timestamp": "00:01",
       "end_timestamp": "00:39",
-      "detailed_content": [
-        {
-          "timestamp": "00:01",
-          "content": "Machine learning is used for tasks like detecting skin cancer and sorting cucumbers, showcasing its broad applications."
-        },
-        {
-          "timestamp": "00:20",
-          "content": "Machine learning empowers systems to perform complex tasks beyond traditional programming."
-        }
-      ]
+      "summary": "..."
       "questions": [
         {
           "type": "discussion",
@@ -66,7 +49,7 @@ Example:
           "correct_answer": "Playing chess",
           "explanation": "The video mentions detecting skin cancer, sorting cucumbers, and escalator repair but does not mention playing chess.",
           "hints": [
-            "You may review the video at timestamp ...",
+            "..",
             ...
           ],
           "reference_timestamp": "00:01"
@@ -109,162 +92,59 @@ Example:
 {
   "topics": [
     {
-      "title": "Overview and Problem Setup in Machine Learning",
+      "title": "Machine Learning Basics",
       "learning_objectives": [
-        "Understand the real-world applications of machine learning",
-        "Learn what a model is and the goal of training",
-        "Recognize the example problem of classifying drinks as wine or beer"
+        "Understand real-world uses of machine learning",
+        "Know what a model is and what training means",
+        "Recognize the idea of using features to answer questions"
       ],
       "start_timestamp": "00:01",
       "end_timestamp": "00:39",
-      "detailed_summary": {
-        "points": [
-          {
-            "timestamp": "00:01",
-            "text": "Machine learning enables computers to perform new tasks such as detecting skin cancer, sorting cucumbers, or identifying escalator faults."
-          },
-          {
-            "timestamp": "00:25",
-            "text": "The video introduces a simple example: building a system (called a model) to classify whether a drink is wine or beer."
-          },
-          {
-            "timestamp": "00:34",
-            "text": "Training a model means creating a system that can answer questions correctly most of the time."
-          }
-        ]
-      }
+      "detailed_summary": "The video starts by explaining that machine learning gives computers new abilities, like detecting skin cancer or sorting cucumbers. The host introduces the main question: how does machine learning actually work? As an example, the video sets up a problem where a computer must decide if a drink is wine or beer. The system built to answer this question is called a 'model,' and creating it is called 'training'. The goal of training is to make a model that answers correctly most of the time."
     },
     {
-      "title": "Data Collection and Preparation",
+      "title": "Data Collection",
       "learning_objectives": [
-        "Understand the importance of collecting quality and relevant data",
-        "Learn about selecting features for the model",
-        "Recognize the need for data preparation steps like randomization and splitting"
+        "Understand the importance of quality data",
+        "Learn how to select features for machine learning",
+        "Know the process of gathering and measuring data"
       ],
       "start_timestamp": "00:39",
+      "end_timestamp": "01:54",
+      "detailed_summary": "To train a model, we need data. The video explains that you collect data from glasses of wine and beer, measuring two features: color (as a wavelength of light) and alcohol content (as a percentage). These features are chosen because they might help separate wines from beers. Equipment like a spectrometer and hydrometer are used to gather this data. The quality and amount of data directly affects how good the model can be."
+    },
+    {
+      "title": "Data Preparation",
+      "learning_objectives": [
+        "Understand the need for data preparation before training",
+        "Know about data randomization, visualization, and splitting",
+        "Learn the importance of balanced data and cleaning"
+      ],
+      "start_timestamp": "01:54",
       "end_timestamp": "03:43",
-      "detailed_summary": {
-        "points": [
-          {
-            "timestamp": "00:39",
-            "text": "To train a model, data must be collected. Here, data on drinks' color (wavelength of light) and alcohol content (%) are chosen as features."
-          },
-          {
-            "timestamp": "01:18",
-            "text": "Equipment like a spectrometer and hydrometer are used to measure the features from multiple samples of drinks."
-          },
-          {
-            "timestamp": "01:54",
-            "text": "The collected data forms a table with features and labels (wine or beer) to be used as training data."
-          },
-          {
-            "timestamp": "02:35",
-            "text": "Data preparation involves organizing, randomizing, visualizing the data, and checking for imbalances to avoid bias."
-          },
-          {
-            "timestamp": "03:08",
-            "text": "Splitting the data into training and evaluation sets is critical to fairly test the model's performance without overfitting."
-          },
-          {
-            "timestamp": "03:43",
-            "text": "Additional data cleaning like deduplication or normalization happens at this stage if needed."
-          }
-        ]
-      }
+      "detailed_summary": "After collecting data, you must prepare it for training. This involves combining all measurements, randomizing their order, and visualizing the data to spot relationships or imbalances (like having more beer than wine samples). It's also important to split the data into training and evaluation sets, so the model is tested fairly. Other preparation steps can include deduplication and normalization, but for this simple example, those are not needed."
     },
     {
-      "title": "Choosing and Training a Model",
+      "title": "Model Choice & Training",
       "learning_objectives": [
-        "Understand different types of models and choosing one appropriate for the data",
-        "Learn how training adjusts model parameters to improve predictions",
-        "Recognize the analogy of learning to drive as training a model"
+        "Know how to select an appropriate model",
+        "Understand how training works using data",
+        "Learn about weights, biases, and iterative improvement"
       ],
-      "start_timestamp": "04:25",
+      "start_timestamp": "03:43",
       "end_timestamp": "06:24",
-      "detailed_summary": {
-        "points": [
-          {
-            "timestamp": "04:25",
-            "text": "Many models exist for different data types; here a simple linear model is chosen for two numeric features."
-          },
-          {
-            "timestamp": "05:04",
-            "text": "Training is the process of improving the model's prediction accuracy by iteratively adjusting parameters, similar to practicing driving."
-          },
-          {
-            "timestamp": "05:48",
-            "text": "The linear model's parameters include slope (m) and intercept (b), which are adjusted during training to better separate wine and beer."
-          },
-          {
-            "timestamp": "06:24",
-            "text": "Each training iteration updates these parameters to gradually move the decision boundary closer to optimal."
-          }
-        ]
-      }
+      "detailed_summary": "Choosing a model depends on the features and type of data. Here, a simple linear model is used, which can separate wine and beer using a line. Training means adjusting the model's parameters (weights and biases) to improve its predictions, similar to how someone gets better at driving with practice. The process starts with random guesses and then iteratively updates the model so that predictions become more accurate over time."
     },
     {
-      "title": "Model Evaluation and Hyperparameter Tuning",
+      "title": "Evaluation & Prediction",
       "learning_objectives": [
-        "Understand the purpose of model evaluation using unseen data",
-        "Learn about common training and evaluation splits",
-        "Discover the role of hyperparameters and their tuning"
+        "Learn how to evaluate model performance",
+        "Understand hyperparameter tuning",
+        "Know the final steps to make predictions"
       ],
-      "start_timestamp": "07:01",
-      "end_timestamp": "08:51",
-      "detailed_summary": {
-        "points": [
-          {
-            "timestamp": "07:01",
-            "text": "After training, evaluation tests the model on data it has never seen, to estimate real-world performance."
-          },
-          {
-            "timestamp": "07:38",
-            "text": "Typical splits for training and evaluation data are around 70-30 or 80-20, depending on dataset size."
-          },
-          {
-            "timestamp": "07:38",
-            "text": "Hyperparameters like number of training iterations and learning rate control how the model trains and are tuned experimentally."
-          },
-          {
-            "timestamp": "08:16",
-            "text": "Initial conditions of parameters can affect training outcomes, making tuning a critical but sometimes artful step."
-          },
-          {
-            "timestamp": "08:51",
-            "text": "Defining what makes a model 'good enough' helps avoid endless hyperparameter tweaking."
-          }
-        ]
-      }
-    },
-    {
-      "title": "Using the Model for Prediction and Broader Applications",
-      "learning_objectives": [
-        "Learn how trained models make predictions on new data",
-        "Understand the value of machine learning in automating decision-making",
-        "Recognize how the process generalizes to other problems"
-      ],
-      "start_timestamp": "08:51",
+      "start_timestamp": "06:24",
       "end_timestamp": "10:05",
-      "detailed_summary": {
-        "points": [
-          {
-            "timestamp": "08:51",
-            "text": "Once satisfied with training, the model is used to predict whether new drinks are wine or beer based on features."
-          },
-          {
-            "timestamp": "09:28",
-            "text": "Machine learning automates classification by learning from data rather than relying on manual human rules."
-          },
-          {
-            "timestamp": "09:50",
-            "text": "The same steps—data gathering, preparation, model choice, training, evaluation, and prediction—apply broadly to many domains."
-          },
-          {
-            "timestamp": "10:05",
-            "text": "Resources like the TensorFlow Playground allow experimentation with training and hyperparameters interactively."
-          }
-        ]
-      }
+      "detailed_summary": "After training, the model is evaluated using the set-aside data to see how well it works on new, unseen examples. The video discusses tuning parameters like learning rate and training steps (called hyperparameters) to further improve results. Once the model is performing well, it can be used to make predictions, like deciding if a new drink is wine or beer. The process described can be applied to other problems beyond drinks, showing the general steps of machine learning."
     }
   ]
 }

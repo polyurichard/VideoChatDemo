@@ -100,7 +100,6 @@ def get_discussion_prompt():
             "title": first_topic["title"],
             "required": first_topic.get("required", False),
             "learning_objectives": first_topic.get("learning_objectives", []),
-            "summary": first_topic.get("summary", ""),  # Add support for summary field
             "start_timestamp": first_topic.get("start_timestamp", ""),
             "end_timestamp": first_topic.get("end_timestamp", ""),
             "detailed_content": first_topic.get("detailed_content", []),
@@ -361,7 +360,6 @@ def main_chat_page():
                 "title": first_topic["title"],
                 "required": first_topic.get("required", False),
                 "learning_objectives": first_topic.get("learning_objectives", []),
-                "summary": first_topic.get("summary", ""),  # Add support for summary field
                 "start_timestamp": first_topic.get("start_timestamp", ""),
                 "end_timestamp": first_topic.get("end_timestamp", ""),
                 "detailed_content": first_topic.get("detailed_content", []),
@@ -410,34 +408,15 @@ def main_chat_page():
     if "selected_timestamp" not in st.session_state:
         st.session_state.selected_timestamp = 0
 
-    # Initialize question bank visibility state
-    if "show_question_bank" not in st.session_state:
-        st.session_state.show_question_bank = False
+    # Add a "return to home" button at the top of the page
+    if st.button("← Return to Home", key="return_home"):
+        st.session_state.current_page = "welcome"
+        st.rerun()
 
-    # Add navigation buttons at the top of the page in a row
-    top_col1, top_col2, top_col3, top_col4, top_col5 = st.columns([1, 1, 1, 2,1])
-    
-    with top_col5:
-        if st.button("← Return to Home", key="return_home"):
-            st.session_state.current_page = "welcome"
-            st.rerun()
-            
-    with top_col2:
-        # Add button to toggle Question Bank visibility
-        if st.button("📚 Question", key="toggle_question_bank"):
-            st.session_state.show_question_bank = True
-            st.rerun()
-            
-    with top_col1:
-        # Add button to return to chat view
-        if st.button("💬 Chat", key="toggle_chat"):
-            st.session_state.show_question_bank = False
-            st.rerun()
-
-    # Function to update selected timestamp and select the topic
-    def set_timestamp_and_topic(timestamp, topic_title=None):
-        # Convert timestamp in mm:ss to seconds
-        # st.session_state.clicked_timestamp = True
+    # Function to update selected timestamp without rerun
+    def set_timestamp(timestamp):
+        # convert timestamp in mm:ss to seconds
+        st.session_state.clicked_timestamp = True
         parts = timestamp.split(":")
         if len(parts) == 2:
             minutes = int(parts[0])
@@ -446,10 +425,7 @@ def main_chat_page():
         elif len(parts) == 1:
             t = int(parts[0])
         st.session_state.selected_timestamp = t
-        
-        # If a topic title is provided, also select that topic
-        if topic_title:
-            store_topic_data(topic_title)
+        # Remove st.rerun() as it's a no-op in callbacks
 
     # Function to store selected topic data
     def store_topic_data(topic_title):
@@ -477,7 +453,6 @@ def main_chat_page():
                     "title": topic["title"],
                     "required": topic.get("required", False),
                     "learning_objectives": topic.get("learning_objectives", []),
-                    "summary": topic.get("summary", ""),  # Add support for summary field
                     "start_timestamp": topic.get("start_timestamp", ""),
                     "end_timestamp": topic.get("end_timestamp", ""),
                     "detailed_content": topic.get("detailed_content", []),
@@ -508,19 +483,21 @@ def main_chat_page():
         
         # Topic Dashboard Panel (now collapsible with expander)
         with st.expander("Progress", expanded=True):
-            # Create clickable topic table - removed the Start column
-            col1, col2, col3 = st.columns([4, 1, 1])
+            # Create clickable topic table
+            col1, col2, col3, col4 = st.columns([1, 3, 1, 1])
             
             with col1:
-                st.subheader("Topics")
+                st.subheader("Start")
             
             with col2:
+                st.subheader("Topics")
+            
+            with col3:
                 st.subheader("Status")
                 
-            with col3:
+            with col4:
                 st.subheader("Progress")
-              
-            # Display each topic with progress and link in table rows
+              # Display each topic with progress and link in table rows
             for topic_idx, topic_data in enumerate(all_topics["topics"]):
                 topic = topic_data["title"]
                 is_required = topic_data.get("required", False)
@@ -537,26 +514,36 @@ def main_chat_page():
                     
                 st.session_state.topic_progress[topic] = progress_pct
                 
-                # Create a row for each topic - removed the Start column
-                cols = st.columns([4, 1, 1])
+                # Create a row for each topic
+                cols = st.columns([1, 3, 1, 1])
                 
-                # First column (now topic button) - combined the functionality of previous columns 1 and 2
+                # First column: Start button with emoji
                 with cols[0]:
+                    start_button = st.button(
+                        "▶️",
+                        key=f"start_{topic}",
+                        help=f"Start learning this topic",
+                        on_click=store_topic_data,
+                        args=(topic,)
+                    )
+                
+                # Second column: Topic button
+                with cols[1]:
                     topic_button = st.button(
                         topic,
                         key=f"topic_{topic}",
-                        help=f"Click to select {topic} and set timestamp to {timestamp}",
-                        on_click=set_timestamp_and_topic,
-                        args=(timestamp, topic)
+                        help=f"Click to jump to {topic} at {timestamp} seconds",
+                        on_click=set_timestamp,
+                        args=(timestamp,)
                     )
                 
-                # Second column (previously third): Required/Optional status
-                with cols[1]:
+                # Third column: Required/Optional status
+                with cols[2]:
                     status_label = "🔷 Core" if is_required else "◻️ Optional"
                     st.write(status_label)
                 
-                # Third column (previously fourth): Points progress
-                with cols[2]:
+                # Fourth column: Points progress
+                with cols[3]:
                     # Show both points and emoji indicator
                     points_earned = st.session_state.topic_points.get(topic, 0)
                     core_points = st.session_state.topic_core_points.get(topic, 0)
@@ -590,51 +577,152 @@ def main_chat_page():
         # Display selected topic data at the top of the main content area
         if st.session_state.selected_topic_data:
             required_status = "Core" if st.session_state.selected_topic_data.get("required", False) else "Optional"
-            st.caption(f"Status: {required_status}")
-            
-            # Create tabs for different content (removed the Questions tab)
-            # overview_tab, transcript_tab, prompt_tab = st.tabs(["Overview", "Transcript", "Discussion Prompt"])
-            overview_tab, transcript_tab = st.tabs(["Overview", "Transcript"])
-            
-            with overview_tab:
-                # Display topic overview information
-                start = st.session_state.selected_topic_data.get("start_timestamp", "")
-                end = st.session_state.selected_topic_data.get("end_timestamp", "")
-                st.write(f"Timestamp: {start} - {end}")
-
-                if st.session_state.selected_topic_data.get("summary"):
-                    st.markdown("### Topic Summary")
-                    # Replace success alert with a customized background color using info alert
-                    st.info(st.session_state.selected_topic_data.get("summary"))
-                    
-                    # Alternative approach using custom HTML/CSS:
-                    # summary_text = st.session_state.selected_topic_data.get("summary")
-                    # st.markdown(
-                    #     f"""
-                    #     <div style="background-color:#e6f3ff; padding:15px; border-radius:5px; margin:10px 0;">
-                    #     {summary_text}
-                    #     </div>
-                    #     """, 
-                    #     unsafe_allow_html=True
-                    # )
+            with st.expander(f"Topic: {st.session_state.selected_topic_data['title']} ({required_status})", expanded=False):
+                # Add tabs for different content
+                tab1, tab2, tab3, tab4 = st.tabs(["Overview", "Questions", "Transcript", "Discussion Prompt"])
                 
+                with tab1:
+                    start = st.session_state.selected_topic_data.get("start_timestamp", "")
+                    end = st.session_state.selected_topic_data.get("end_timestamp", "")
+                    if start != "" :
+                        st.write(f"Start Timestamp: {start}")
+                    if end != "":
+                        st.write(f"End Timestamp: {end}")
+                                        
+                    # Display topic overview information
+                    st.subheader("Learning Objectives")
+                    for i, objective in enumerate(st.session_state.selected_topic_data.get("learning_objectives", [])):
+                        st.write(f"- {objective}")
+                        
 
-                
-                if st.session_state.selected_topic_data.get("detailed_content"):
-                    st.markdown("### Detailed Content")
+                    st.subheader("Detailed Content")
                     for content_item in st.session_state.selected_topic_data.get("detailed_content", []):
                         timestamp = content_item.get("timestamp", "")
                         content = content_item.get("content", "")
                         st.write(f"**({timestamp})** {content}")
-            
-            with transcript_tab:
-                # Display transcript
-                if "transcript" in st.session_state.selected_topic_data:
-                    st.markdown("### Transcript")
-                    st.text_area("Transcript", st.session_state.selected_topic_data["transcript"], 
-                                height=300, key="transcript_text", disabled=True, label_visibility="collapsed")
-            
+                
+                with tab2:
+                    # Create two columns for Required and Optional questions
+                    required_questions = [q for q in st.session_state.selected_topic_data.get("questions", []) if q.get("required", False)]
+                    optional_questions = [q for q in st.session_state.selected_topic_data.get("questions", []) if not q.get("required", False)]
+                    
+                    # Display required questions first with a header
+                    if required_questions:
+                        st.subheader("Core Questions")
+                        for i, question in enumerate(required_questions):
+                            q_type = question.get("type", "Unknown")
+                            st.write(f"**{q_type.capitalize()} Question {i+1}:** {question['question']}")
+                            st.write(f"Points: {question['point_value']}")
+                            
+                            # If it's a multiple-choice question, show options with correct answer selected by default
+                            if q_type == "mcq" and "options" in question:
+                                options = question["options"]
+                                # Get the index of correct answer in options list
+                                default_index = 0
+                                if "correct_answer" in question:
+                                    try:
+                                        default_index = options.index(question["correct_answer"])
+                                    except ValueError:
+                                        default_index = 0
+                                
+                                # Display radio buttons with correct answer pre-selected - MOVED INSIDE THE IF BLOCK
+                                st.radio(
+                                    f"Options for Q{i+1}", 
+                                    options, 
+                                    key=f"req_question_{i}",
+                                    index=default_index  # Pre-select correct answer
+                                )
+                                
+                                # Show the correct answer and explanation automatically
+                                if "correct_answer" in question:
+                                    st.success(f"**Correct Answer:** {question['correct_answer']}")
+                                    if "explanation" in question:
+                                        st.info(f"**Explanation:** {question['explanation']}")
+                            else:
+                                # For non-MCQ questions, show sample answer automatically
+                                if "sample_answer" in question:
+                                    st.success(f"**Sample Answer:** {question['sample_answer']}")
+                                    if "explanation" in question:
+                                        st.info(f"**Explanation:** {question['explanation']}")
+                            
+                            # Add hints directly without toggle button
+                            if "hints" in question:
+                                st.markdown("**Hints:**")
+                                for hint in question["hints"]:
+                                    st.write(f"- {hint}")
+                            
+                            # Add reference timestamp if available
+                            if "reference_timestamp" in question:
+                                st.write(f"**Reference:** {question['reference_timestamp']}")
+                                
+                            # Add separator between questions
+                            st.markdown("---")
 
+                    # Then display optional questions
+                    if optional_questions:
+                        st.subheader("Optional Questions")
+                        for i, question in enumerate(optional_questions):
+                            q_type = question.get("type", "Unknown")
+                            st.write(f"**{q_type.capitalize()} Question {i+1}:** {question['question']}")
+                            st.write(f"Points: {question['point_value']}")
+                            
+                            # Same display logic for optional questions
+                            if q_type == "mcq" and "options" in question:
+                                options = question["options"]
+                                default_index = 0
+                                if "correct_answer" in question:
+                                    try:
+                                        default_index = options.index(question["correct_answer"])
+                                    except ValueError:
+                                        default_index = 0
+                                
+                                # Display radio buttons with correct answer pre-selected
+                                st.radio(
+                                    f"Options for Q{i+1}", 
+                                    options, 
+                                    key=f"opt_question_{i}",
+                                    index=default_index
+                                )
+                                
+                                # Show the correct answer and explanation automatically
+                                if "correct_answer" in question:
+                                    st.success(f"**Correct Answer:** {question['correct_answer']}")
+                                    if "explanation" in question:
+                                        st.info(f"**Explanation:** {question['explanation']}")
+                            else:
+                                # For non-MCQ questions, show sample answer automatically
+                                if "sample_answer" in question:
+                                    st.success(f"**Sample Answer:** {question['sample_answer']}")
+                                    if "explanation" in question:
+                                        st.info(f"**Explanation:** {question['explanation']}")
+                            
+                            # Add hints directly without toggle button
+                            if "hints" in question:
+                                st.markdown("**Hints:**")
+                                for hint in question["hints"]:
+                                    st.write(f"- {hint}")
+                            
+                            # Add reference timestamp if available
+                            if "reference_timestamp" in question:
+                                st.write(f"**Reference:** {question['reference_timestamp']}")
+                                
+                            # Add separator between questions
+                            st.markdown("---")
+                
+                with tab3:
+                    # Display transcript
+                    if "transcript" in st.session_state.selected_topic_data:
+                        st.markdown("### Transcript")
+                        st.text_area("Transcript", st.session_state.selected_topic_data["transcript"], 
+                                    height=300, key="transcript_text", disabled=True, label_visibility="collapsed")
+                
+                with tab4:
+                    # Display the discussion prompt as plain text
+                    st.markdown("### Discussion Prompt")
+                    st.markdown("This is the prompt used by the AI to guide discussion about this topic:")
+                    
+                    st.text_area("Discussion Prompt", st.session_state.discussion_prompt, 
+                                height=400, key="discussion_prompt_text", disabled=True, label_visibility="collapsed")    
 
     # Add a button to start a discussion with this prompt
     # Print current topic
@@ -795,359 +883,53 @@ def main_chat_page():
 
 
 
-    # Check if Question Bank should be shown
-    if st.session_state.show_question_bank:
-        st.header("Question Bank")
+    st.subheader("Topic: " + st.session_state.selected_topic_data.get("title", "No Topic Selected") + 
+                 (" (Core)" if st.session_state.selected_topic_data.get("required", False) else " (Optional)"))
+    display_topic_details()
+    start_button = st.button("Start Discussion", key="start_discussion_btn", on_click = start_chat)
+
+
+    if "messages" in st.session_state and len(st.session_state.messages) > 0:
         
-        # Collect all questions from all topics
-        all_questions = []
-        for topic in all_topics["topics"]:
-            topic_title = topic["title"]
-            for question in topic.get("questions", []):
-                # Add topic title to the question for reference
-                question["topic_title"] = topic_title
-                all_questions.append(question)
-                
-        # Create filter selectors in two columns
-        filter_col1, filter_col2, filter_col3 = st.columns([1, 1, 1])
+        # Display chat messages from history on app rerun
+        for message in st.session_state.messages:
+            if message["role"] != "system": #hide the system message in chat
+                with st.chat_message(message["role"]):
+                    st.markdown(message["content"])
+
+        user_input = st.chat_input("Input your message here...")
         
-        with filter_col1:
-            # Create a filter for topics
-            topic_titles = ["All Topics"] + list(set(topic["title"] for topic in all_topics["topics"]))
-            selected_topic = st.selectbox("Filter by topic:", topic_titles)
-        
-        with filter_col2:
-            # Create a filter for question types
-            question_types = ["All Types"] + sorted(list(set(q.get("type", "unknown") for q in all_questions)))
-            selected_type = st.selectbox("Filter by question type:", question_types)
-        
-        with filter_col3:
-            # Create a filter for required/optional
-            required_filter = st.radio("Show questions:", ["All", "Required Only", "Optional Only"], horizontal=True)
-        
-        # Apply filters
-        filtered_questions = all_questions
-        
-        if selected_topic != "All Topics":
-            filtered_questions = [q for q in filtered_questions if q.get("topic_title") == selected_topic]
+
+        if user_input:
+            # Add user message to chat history
+            st.session_state.messages.append({"role": "user", "content": user_input})
+            # Update message count when user sends a message
+            st.session_state.message_count += 1
             
-        if selected_type != "All Types":
-            filtered_questions = [q for q in filtered_questions if q.get("type") == selected_type]
-        
-        if required_filter == "Required Only":
-            filtered_questions = [q for q in filtered_questions if q.get("required", False)]
-        elif required_filter == "Optional Only":
-            filtered_questions = [q for q in filtered_questions if not q.get("required", False)]
-        
-        # Show results count
-        st.write(f"Showing {len(filtered_questions)} questions")
-        
-        # Check if we have questions to display
-        if not filtered_questions:
-            st.info("No questions match your selected filters.")
-        else:
-            # Initialize session state for edited questions if not already present
-            if "edited_questions" not in st.session_state:
-                st.session_state.edited_questions = {}
-                
-            # Create an editable table of questions
-            edited = False
+            with st.chat_message("user"):
+                st.markdown(user_input)        
+            formatted_messages = []
+            for msg in st.session_state.messages:
+                if msg["role"] == "user":
+                    formatted_messages.append(("user", msg["content"]))
+                elif msg["role"] == "assistant":
+                    formatted_messages.append(("assistant", msg["content"]))
+                elif msg["role"] == "system":
+                    formatted_messages.append(("system", msg["content"]))
+                        
+            response = llm_service.send_message(formatted_messages)
+            # response = "Mock 2"
+
+            st.session_state.messages.append({"role": "assistant", "content": response})
+            with st.chat_message("assistant"):
+                st.markdown(response)
             
-            # Use a form to capture edits
-            with st.form("question_table_form"):
-                for i, question in enumerate(filtered_questions):
-                    q_id = f"{question.get('topic_title')}_{question.get('type')}_{i}"
-                    st.subheader(f"Question {i+1}")
-                    
-                    # Create a container for each question with columns
-                    cols = st.columns([3, 1])
-                    
-                    with cols[0]:
-                        # Question text
-                        q_text = st.text_area(
-                            "Question text", 
-                            question.get("question", ""), 
-                            key=f"q_text_{q_id}",
-                            height=100
-                        )
-                        
-                        # Topic title (non-editable)
-                        st.text_input(
-                            "Topic", 
-                            question.get("topic_title", ""), 
-                            disabled=True,
-                            key=f"topic_{q_id}" 
-                        )
-                        
-                        # Question type
-                        q_type = st.selectbox(
-                            "Question type", 
-                            ["mcq", "discussion", "short", "reflective"],
-                            index=["mcq", "discussion", "short", "reflective"].index(question.get("type", "discussion")),
-                            key=f"q_type_{q_id}"
-                        )
-                        
-                    with cols[1]:
-                        # Points
-                        q_points = st.number_input(
-                            "Points", 
-                            min_value=1, 
-                            max_value=10, 
-                            value=question.get("point_value", 1),
-                            key=f"q_points_{q_id}"
-                        )
-                        
-                        # Required status
-                        q_required = st.checkbox(
-                            "Required", 
-                            value=question.get("required", False),
-                            key=f"q_required_{q_id}"
-                        )
-                        
-                        # Reference timestamp
-                        q_timestamp = st.text_input(
-                            "Reference timestamp", 
-                            question.get("reference_timestamp", ""),
-                            key=f"q_timestamp_{q_id}"
-                        )
-                    
-                    # For MCQ questions, show options
-                    if q_type == "mcq":
-                        # Options as a multi-line text area, one per line
-                        options_text = "\n".join(question.get("options", ["Option 1", "Option 2", "Option 3", "Option 4"]))
-                        new_options_text = st.text_area(
-                            "Options (one per line)", 
-                            options_text,
-                            height=100,
-                            key=f"q_options_{q_id}"
-                        )
-                        new_options = [opt.strip() for opt in new_options_text.split("\n") if opt.strip()]
-                        
-                        # Correct answer
-                        correct_idx = 0
-                        if question.get("correct_answer") in question.get("options", []):
-                            correct_idx = question.get("options", []).index(question.get("correct_answer", ""))
-                        
-                        correct_answer = st.selectbox(
-                            "Correct answer", 
-                            new_options if new_options else [""],
-                            index=min(correct_idx, len(new_options)-1) if new_options else 0,
-                            key=f"q_correct_{q_id}"
-                        )
-                    else:
-                        # For non-MCQ questions, show sample answer
-                        sample_answer = st.text_area(
-                            "Sample answer", 
-                            question.get("sample_answer", ""),
-                            height=100,
-                            key=f"q_sample_{q_id}"
-                        )
-                    
-                    # Explanation for all question types
-                    explanation = st.text_area(
-                        "Explanation", 
-                        question.get("explanation", ""),
-                        height=100,
-                        key=f"q_explanation_{q_id}"
-                    )
-                    
-                    # Hints as a multi-line text area, one per line
-                    hints_text = "\n".join(question.get("hints", []))
-                    new_hints_text = st.text_area(
-                        "Hints (one per line)", 
-                        hints_text,
-                        height=100,
-                        key=f"q_hints_{q_id}"
-                    )
-                    new_hints = [hint.strip() for hint in new_hints_text.split("\n") if hint.strip()]
-                    
-                    # Store all edits in session state
-                    st.session_state.edited_questions[q_id] = {
-                        "topic_title": question.get("topic_title"),
-                        "question": q_text,
-                        "type": q_type,
-                        "point_value": q_points,
-                        "required": q_required,
-                        "reference_timestamp": q_timestamp,
-                        "explanation": explanation,
-                        "hints": new_hints,
-                    }
-                    
-                    # Add type-specific fields
-                    if q_type == "mcq":
-                        st.session_state.edited_questions[q_id]["options"] = new_options
-                        st.session_state.edited_questions[q_id]["correct_answer"] = correct_answer
-                    else:
-                        st.session_state.edited_questions[q_id]["sample_answer"] = sample_answer
-                    
-                    st.markdown("---")
-                
-                # Submit button for all edits
-                submit_button = st.form_submit_button("Save All Changes")
-                if submit_button:
-                    st.success("Changes saved successfully!")
-                    # Here you would implement the logic to save the edits back to your data source
-                    # This would typically involve updating your topics_with_q.json file
-                    
-            # Add export button outside the form
-            if st.button("Export Questions"):
-                # Create a JSON string of all edited questions
-                export_data = json.dumps(list(st.session_state.edited_questions.values()), indent=2)
-                st.download_button(
-                    label="Download JSON",
-                    data=export_data,
-                    file_name="exported_questions.json",
-                    mime="application/json"
-                )
-        
-        # Add close button at the bottom
-        if st.button("Close Question Bank", key="close_question_bank"):
-            st.session_state.show_question_bank = False
+            update_topic_points(st.session_state.selected_topic_data.get("title", ""))
             st.rerun()
-    else:
-        # Only show the topic info and chat when not in Question Bank mode
-        topic_title = st.session_state.selected_topic_data.get("title", "No Topic Selected")
-        timestamp = st.session_state.selected_topic_data.get("start_timestamp", "00:00")
-        
-        # Create a row with topic title and play button
-        title_col, play_col = st.columns([3, 1])
-        st.subheader(f"Topic: {topic_title}")
-            
-        
-        # Display topic info in tabs directly instead of using an expander
-        if st.session_state.selected_topic_data:
-            # Create tabs for different content (removed the Questions tab)
-            overview_tab, transcript_tab = st.tabs(["Overview", "Transcript"])
-            
-            with overview_tab:
-                # Display topic overview information
-                start = st.session_state.selected_topic_data.get("start_timestamp", "")
-                end = st.session_state.selected_topic_data.get("end_timestamp", "")
-                st.write(f"Timestamp: {start} - {end}")
-
-                
-                # Add a button to play the video at the topic's timestamp
-                if st.button("▶️ Play Video", key="play_video_btn"):
-                    # Set timestamp and autoplay flag
-                    st.session_state.clicked_timestamp = True
-                    parts = timestamp.split(":")
-                    if len(parts) == 2:
-                        minutes = int(parts[0])
-                        seconds = int(parts[1])
-                        t = minutes * 60 + seconds
-                    else:
-                        t = int(timestamp)
-                    st.session_state.selected_timestamp = t
-                    st.rerun()  # Refresh to start video
-        
-
-                
-
-                if st.session_state.selected_topic_data.get("summary"):
-                    st.markdown("### Topic Summary")
-                    # Replace success alert with a customized background color using info alert
-                    st.info(st.session_state.selected_topic_data.get("summary"))
-                    
-                    # Alternative approach using custom HTML/CSS:
-                    # summary_text = st.session_state.selected_topic_data.get("summary")
-                    # st.markdown(
-                    #     f"""
-                    #     <div style="background-color:#e6f3ff; padding:15px; border-radius:5px; margin:10px 0;">
-                    #     {summary_text}
-                    #     </div>
-                    #     """, 
-                    #     unsafe_allow_html=True
-                    # )
-                
-
-                
-                if st.session_state.selected_topic_data.get("detailed_content"):
-                    st.markdown("### Detailed Content")
-                    for content_item in st.session_state.selected_topic_data.get("detailed_content", []):
-                        timestamp = content_item.get("timestamp", "")
-                        content = content_item.get("content", "")
-                        st.write(f"**({timestamp})** {content}")
-            
-            with transcript_tab:
-                # Display transcript
-                if "transcript" in st.session_state.selected_topic_data:
-                    st.markdown("### Transcript")
-                    st.text_area("Transcript", st.session_state.selected_topic_data["transcript"], 
-                                height=300, key="transcript_text", disabled=True, label_visibility="collapsed")
-  
-                
-                # Add buttons for saving changes or resetting to default
-                col1, col2 = st.columns([1, 1])
-                with col1:
-                    if st.button("Save Changes", key="save_prompt_btn"):
-                        # Update the prompt in session state
-                        st.session_state.discussion_prompt = edited_prompt
-                        st.session_state.edited_prompt = edited_prompt
-                        st.success("Prompt updated successfully!")
-                
-                with col2:
-                    if st.button("Reset to Default", key="reset_prompt_btn"):
-                        # Re-generate the default prompt
-                        default_prompt = get_discussion_prompt()
-                        st.session_state.discussion_prompt = default_prompt
-                        st.session_state.edited_prompt = default_prompt
-                        st.success("Prompt reset to default!")
-                        st.rerun()  # Refresh to show the updated prompt
-
-        # Create single Discussion interface
-        st.markdown("---")
-        col1, col2, col3= st.columns([1, 1,3])
-        with col1:
-            if "messages" not in st.session_state or len(st.session_state.messages) == 0:
-                start_button = st.button("Start Chat", key="start_discussion_btn", on_click=start_chat)
-            else:
-                start_button = st.button("Restart Chat", key="continue_discussion_btn", on_click=start_chat)
-
-        with col2:
-            if "messages" not in st.session_state or len(st.session_state.messages) > 0:
-                start_exercise = st.button("Start Practice", key="start_exercise_btn", on_click=start_exercise)
 
 
-        if "messages" in st.session_state and len(st.session_state.messages) > 0:
-            
-            # Display chat messages from history on app rerun
-            for message in st.session_state.messages:
-                if message["role"] != "system": #hide the system message in chat
-                    with st.chat_message(message["role"]):
-                        st.markdown(message["content"])
+        start_exercise = st.button("Start Practice", key="start_exercise_btn", on_click=start_exercise)
 
-            user_input = st.chat_input("Input your message here...")
-            
-
-            if user_input:
-                # Add user message to chat history
-                st.session_state.messages.append({"role": "user", "content": user_input})
-                # Update message count when user sends a message
-                st.session_state.message_count += 1
-                
-                with st.chat_message("user"):
-                    st.markdown(user_input)        
-                formatted_messages = []
-                for msg in st.session_state.messages:
-                    if msg["role"] == "user":
-                        formatted_messages.append(("user", msg["content"]))
-                    elif msg["role"] == "assistant":
-                        formatted_messages.append(("assistant", msg["content"]))
-                    elif msg["role"] == "system":
-                        formatted_messages.append(("system", msg["content"]))
-                            
-                response = llm_service.send_message(formatted_messages)
-                # response = "Mock 2"
-
-                st.session_state.messages.append({"role": "assistant", "content": response})
-                with st.chat_message("assistant"):
-                    st.markdown(response)
-                
-                update_topic_points(st.session_state.selected_topic_data.get("title", ""))
-                st.rerun()
-
-
-            
 # Main code - determine which page to show
 if st.session_state.current_page == "welcome":
     welcome_page()
