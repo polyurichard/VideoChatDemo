@@ -8,7 +8,7 @@ Output the number of points the user should receive based on the following crite
 </user_conversation>
 
 Output a json object without ```json. Fields:
-- think: first think about the intent of user and whether the user has provided a good explanation to his answer before awarding score.
+- think: first think about the intent of user and based on the AI response, if the user should be awarded any point.
 - user_input_classification: 
     - "answer": if the user is answering the question from the AI and either receive or not receive a score from the AI.
     - "question": if the user is asking a question to the AI.

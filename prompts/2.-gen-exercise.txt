@@ -25,9 +25,7 @@ question 2 will be mcq questions
 Fields:
 Topic 1: Introduction to Machine Learning and Use Case
 Learning objectives: ...
-Timestamp: ...
-Video summary: ...
-Questions:
+...
 
 Example:
 {
@@ -40,6 +38,7 @@ Example:
         "Explain how machine learning enhances computer capabilities"
       ],
       "start_timestamp": "00:01",
+      "end_timestamp": "00:39",
       "detailed_content": [
         {
           "timestamp": "00:01",
