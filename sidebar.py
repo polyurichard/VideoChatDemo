@@ -102,20 +102,31 @@ def render_sidebar(all_topics, topic_timestamps, core_topics, youtube_url,extrac
             core_topics_count = len(core_topics)
             st.metric("Core Topics Completed", f"{st.session_state.completed_topics_count}/{core_topics_count}")
         
+        # Add custom CSS to make the progress bar thicker
+        st.markdown("""
+        <style>
+            div[data-testid="stProgressBar"] {
+                height: 20px !important;
+            }
+            div[data-testid="stProgressBar"] > div {
+                height: 20px !important;
+            }
+        </style>
+        """, unsafe_allow_html=True)
+        
+        # Add an overall progress bar for all topics
+        core_topics_count = max(1, len(core_topics))  # Prevent division by zero
+        overall_progress = (st.session_state.completed_topics_count / core_topics_count) * 100
+        
+        # Instead of using columns, display progress bar and text sequentially
+
+        st.markdown(f"<h3 style='text-align: center; margin-top: 0px; margin-bottom: 10px;'>Topics completed: {st.session_state.completed_topics_count}/{core_topics_count} ({overall_progress:.1f}%)</h3>", unsafe_allow_html=True)
+        st.progress(overall_progress + 10 / 100)
+
         # Topic Dashboard Panel (now collapsible with expander)
-        with st.expander("Progress", expanded=True):
+        with st.expander("Topics", expanded=True):
             # Create clickable topic table - removed the Start column
-            col1, col2, col3 = st.columns([4, 1, 1])
-            
-            with col1:
-                st.subheader("Topics")
-            
-            with col2:
-                st.subheader("Status")
-                
-            with col3:
-                st.subheader("Progress")
-              
+
             # Display each topic with progress and link in table rows
             for topic_idx, topic_data in enumerate(all_topics["topics"]):
                 topic = topic_data["title"]
