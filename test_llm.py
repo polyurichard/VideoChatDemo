@@ -2,9 +2,8 @@ from llm import LLMService
 
 llm_service = LLMService(
         config_path=".env",
-        openai_api_version="2024-12-01-preview",
-        azure_deployment="gpt-4o-mini",
-        temperature=0
+        temperature=0,
+        gpt_version="gpt-4.1-mini"
     )
 messages = [
                 ("user", "hi, how are you?")

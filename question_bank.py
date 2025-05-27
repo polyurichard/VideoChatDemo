@@ -56,117 +56,175 @@ def show_question_bank(all_topics):
         if "edited_questions" not in st.session_state:
             st.session_state.edited_questions = {}
             
-        # Create an editable table of questions
-        edited = False
-        
-        # Use a form to capture edits
-        with st.form("question_table_form"):
-            for i, question in enumerate(filtered_questions):
-                q_id = f"{question.get('topic_title')}_{question.get('type')}_{i}"
-                st.subheader(f"Question {i+1}")
-                
-                # Create a container for each question with columns
-                cols = st.columns([3, 1])
-                
-                with cols[0]:
-                    # Question text
-                    q_text = st.text_area(
-                        "Question text", 
-                        question.get("question", ""), 
-                        key=f"q_text_{q_id}",
-                        height=100
-                    )
-                    
-                    # Topic title (non-editable)
-                    st.text_input(
-                        "Topic", 
-                        question.get("topic_title", ""), 
-                        disabled=True,
-                        key=f"topic_{q_id}" 
-                    )
-                    
-                    # Question type
-                    q_type = st.selectbox(
-                        "Question type", 
-                        ["mcq", "discussion", "short", "reflective"],
-                        index=["mcq", "discussion", "short", "reflective"].index(question.get("type", "discussion")),
-                        key=f"q_type_{q_id}"
-                    )
-                    
-                with cols[1]:
-                    # Points
-                    q_points = st.number_input(
-                        "Points", 
-                        min_value=1, 
-                        max_value=10, 
-                        value=question.get("point_value", 1),
-                        key=f"q_points_{q_id}"
-                    )
-                    
-                    # Required status
-                    q_required = st.checkbox(
-                        "Required", 
-                        value=question.get("required", False),
-                        key=f"q_required_{q_id}"
-                    )
-                    
-                    # Reference timestamp
-                    q_timestamp = st.text_input(
-                        "Reference timestamp", 
-                        question.get("reference_timestamp", ""),
-                        key=f"q_timestamp_{q_id}"
-                    )
-                
-                # For MCQ questions, show options
-                if q_type == "mcq":
-                    # Options as a multi-line text area, one per line
-                    options_text = "\n".join(question.get("options", ["Option 1", "Option 2", "Option 3", "Option 4"]))
-                    new_options_text = st.text_area(
-                        "Options (one per line)", 
-                        options_text,
-                        height=100,
-                        key=f"q_options_{q_id}"
-                    )
-                    new_options = [opt.strip() for opt in new_options_text.split("\n") if opt.strip()]
-                    
-                    # Correct answer
-                    correct_idx = 0
-                    if question.get("correct_answer") in question.get("options", []):
-                        correct_idx = question.get("options", []).index(question.get("correct_answer", ""))
-                    
-                    correct_answer = st.selectbox(
-                        "Correct answer", 
-                        new_options if new_options else [""],
-                        index=min(correct_idx, len(new_options)-1) if new_options else 0,
-                        key=f"q_correct_{q_id}"
-                    )
-                else:
-                    # For non-MCQ questions, show sample answer
-                    sample_answer = st.text_area(
-                        "Sample answer", 
-                        question.get("sample_answer", ""),
-                        height=100,
-                        key=f"q_sample_{q_id}"
-                    )
-                
-                # Explanation for all question types
-                explanation = st.text_area(
-                    "Explanation", 
-                    question.get("explanation", ""),
-                    height=100,
-                    key=f"q_explanation_{q_id}"
+        # Display each question individually for editing - without expanders
+        for i, question in enumerate(filtered_questions):
+            # Add a separator before each question (except the first one)
+            if i > 0:
+                st.markdown("---")
+            
+            q_id = f"{question.get('topic_title')}_{question.get('type')}_{i}"
+            
+            # Question header with number
+            st.subheader(f"Question {i+1}")
+            
+            # Create columns for question details
+            cols = st.columns([3, 1])
+            
+            with cols[0]:
+                # Question text
+                q_text = st.text_area(
+                    "Question text", 
+                    question.get("question", ""), 
+                    key=f"q_text_{q_id}",
+                    height=100
                 )
                 
-                # Hints as a multi-line text area, one per line
-                hints_text = "\n".join(question.get("hints", []))
-                new_hints_text = st.text_area(
-                    "Hints (one per line)", 
-                    hints_text,
-                    height=100,
-                    key=f"q_hints_{q_id}"
+                # Topic title (non-editable)
+                st.text_input(
+                    "Topic", 
+                    question.get("topic_title", ""), 
+                    disabled=True,
+                    key=f"topic_{q_id}" 
                 )
-                new_hints = [hint.strip() for hint in new_hints_text.split("\n") if hint.strip()]
                 
+                # Question type
+                q_type = st.selectbox(
+                    "Question type", 
+                    ["mcq", "discussion", "short", "reflective"],
+                    index=["mcq", "discussion", "short", "reflective"].index(question.get("type", "discussion")),
+                    key=f"q_type_{q_id}"
+                )
+                
+            with cols[1]:
+                # Points
+                q_points = st.number_input(
+                    "Points", 
+                    min_value=1, 
+                    max_value=10, 
+                    value=question.get("point_value", 1),
+                    key=f"q_points_{q_id}"
+                )
+                
+                # Required status
+                q_required = st.checkbox(
+                    "Required", 
+                    value=question.get("required", False),
+                    key=f"q_required_{q_id}"
+                )
+                
+                # Reference timestamp
+                q_timestamp = st.text_input(
+                    "Reference timestamp", 
+                    question.get("reference_timestamp", ""),
+                    key=f"q_timestamp_{q_id}"
+                )
+            
+            # For MCQ questions, show options as individual fields
+            if q_type == "mcq":
+                st.subheader("Options")
+                
+                # Initialize options in session state if not already present
+                option_key = f"options_{q_id}"
+                if option_key not in st.session_state:
+                    st.session_state[option_key] = question.get("options", ["Option 1", "Option 2", "Option 3", "Option 4"])
+                
+                # Current correct answer
+                correct_answer = question.get("correct_answer", "")
+                
+                # Display each option with its own text field
+                new_options = []
+                
+                # Create a checkbox for selecting the correct answer for each option
+                options_to_remove = []
+                correct_option = st.text_input("Correct Answer", correct_answer, key=f"correct_input_{q_id}")
+                
+                st.write("Enter each option below. Mark the correct one in the field above.")
+                for idx, option in enumerate(st.session_state[option_key]):
+                    col1, col2 = st.columns([5, 1])
+                    with col1:
+                        option_text = st.text_input(
+                            f"Option {idx+1}", 
+                            option,
+                            key=f"option_{q_id}_{idx}"
+                        )
+                        new_options.append(option_text)
+                    
+                    with col2:
+                        if st.button("Remove", key=f"remove_option_{q_id}_{idx}"):
+                            options_to_remove.append(idx)
+                
+                # Handle option removal
+                if options_to_remove:
+                    # Remove options in reverse order to avoid index shifts
+                    for idx in sorted(options_to_remove, reverse=True):
+                        st.session_state[option_key].pop(idx)
+                    st.rerun()
+                
+                # Add new option button
+                if st.button("Add Option", key=f"add_option_{q_id}"):
+                    st.session_state[option_key].append(f"New Option {len(st.session_state[option_key])+1}")
+                    st.rerun()
+                
+            else:
+                # For non-MCQ questions, show sample answer
+                sample_answer = st.text_area(
+                    "Sample answer", 
+                    question.get("sample_answer", ""),
+                    height=100,
+                    key=f"q_sample_{q_id}"
+                )
+                correct_answer = ""
+                new_options = []
+            
+            # Explanation for all question types
+            explanation = st.text_area(
+                "Explanation", 
+                question.get("explanation", ""),
+                height=100,
+                key=f"q_explanation_{q_id}"
+            )
+            
+            # Hints as individual fields
+            st.subheader("Hints")
+            
+            # Initialize hints in session state if not already present
+            hint_key = f"hints_{q_id}"
+            if hint_key not in st.session_state:
+                st.session_state[hint_key] = question.get("hints", ["Hint 1"])
+            
+            # Display each hint with its own text field
+            new_hints = []
+            hints_to_remove = []
+            
+            for idx, hint in enumerate(st.session_state[hint_key]):
+                col1, col2 = st.columns([5, 1])
+                with col1:
+                    hint_text = st.text_area(
+                        f"Hint {idx+1}", 
+                        hint,
+                        height=50,
+                        key=f"hint_{q_id}_{idx}"
+                    )
+                    new_hints.append(hint_text)
+                
+                with col2:
+                    if st.button("Remove", key=f"remove_hint_{q_id}_{idx}"):
+                        hints_to_remove.append(idx)
+            
+            # Handle hint removal
+            if hints_to_remove:
+                # Remove hints in reverse order to avoid index shifts
+                for idx in sorted(hints_to_remove, reverse=True):
+                    st.session_state[hint_key].pop(idx)
+                st.rerun()
+            
+            # Add new hint button
+            if st.button("Add Hint", key=f"add_hint_{q_id}"):
+                st.session_state[hint_key].append(f"Hint {len(st.session_state[hint_key])+1}")
+                st.rerun()
+            
+            # Save button for this question
+            if st.button("Save Changes", key=f"save_{q_id}"):
                 # Store all edits in session state
                 st.session_state.edited_questions[q_id] = {
                     "topic_title": question.get("topic_title"),
@@ -182,21 +240,17 @@ def show_question_bank(all_topics):
                 # Add type-specific fields
                 if q_type == "mcq":
                     st.session_state.edited_questions[q_id]["options"] = new_options
-                    st.session_state.edited_questions[q_id]["correct_answer"] = correct_answer
+                    st.session_state.edited_questions[q_id]["correct_answer"] = correct_option
                 else:
                     st.session_state.edited_questions[q_id]["sample_answer"] = sample_answer
                 
-                st.markdown("---")
-            
-            # Submit button for all edits
-            submit_button = st.form_submit_button("Save All Changes")
-            if submit_button:
-                st.success("Changes saved successfully!")
-                # Here you would implement the logic to save the edits back to your data source
-                # This would typically involve updating your topics_with_q.json file
-                
-        # Add export button outside the form
-        if st.button("Export Questions"):
+                st.success("Question updated successfully!")
+        
+        # Add a final separator after the last question
+        st.markdown("---")
+        
+        # Add export button at the bottom
+        if st.button("Export All Questions"):
             # Create a JSON string of all edited questions
             export_data = json.dumps(list(st.session_state.edited_questions.values()), indent=2)
             st.download_button(

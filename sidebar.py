@@ -13,6 +13,26 @@ def store_topic_data(topic_title, extract_transcript, get_discussion_prompt):
     all_topics = get_topics()
     # clear conversation history
     st.session_state.messages = []
+    
+    # Clear MCQ state when switching topics
+    if "mcq_questions" in st.session_state:
+        del st.session_state.mcq_questions
+    if "mcq_attempts" in st.session_state:
+        del st.session_state.mcq_attempts
+    if "submitted_answers" in st.session_state:
+        del st.session_state.submitted_answers
+    if "correct_answers_by_question" in st.session_state:
+        del st.session_state.correct_answers_by_question
+    if "mcq_completed" in st.session_state:
+        del st.session_state.mcq_completed
+    if "mcq_correct_answers" in st.session_state:
+        del st.session_state.mcq_correct_answers
+    if "current_question_index" in st.session_state:
+        del st.session_state.current_question_index
+    if "proceed_to_next" in st.session_state:
+        del st.session_state.proceed_to_next
+    if "current_page" in st.session_state:
+        st.session_state.current_page = "main_page"
 
     # Find the topic data in all_topics
     for i, topic in enumerate(all_topics["topics"]):

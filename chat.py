@@ -5,6 +5,48 @@ import json
 import re
 from question_bank import show_question_bank
 from welcome import welcome_page
+from mcq_quiz import display_mcq_quiz
+
+def start_mcq_panel():
+    """
+    Initialize the MCQ quiz for the selected topic.
+    Prepares the necessary session state variables and transitions to the MCQ quiz page.
+    """
+    # Store the current topic's questions in session state
+    if "selected_topic_data" in st.session_state and st.session_state.selected_topic_data:
+        selected_topic = st.session_state.selected_topic_data
+        
+        # Filter for only MCQ questions from the current selected topic
+        all_questions = selected_topic.get("questions", [])
+        mcq_questions = [q for q in all_questions if q.get("type") == "mcq"]
+        
+        if not mcq_questions:
+            st.error(f"No MCQ questions available for topic: {selected_topic.get('title', '')}")
+            return
+            
+        # Reset MCQ state to start fresh
+        if "mcq_questions" in st.session_state:
+            del st.session_state.mcq_questions
+        if "mcq_attempts" in st.session_state:
+            del st.session_state.mcq_attempts
+        if "submitted_answers" in st.session_state:
+            del st.session_state.submitted_answers
+        if "correct_answers_by_question" in st.session_state:
+            del st.session_state.correct_answers_by_question
+            
+        # Initialize fresh MCQ session variables
+        st.session_state.mcq_questions = mcq_questions
+        st.session_state.mcq_total_questions = len(mcq_questions)
+        st.session_state.current_question_index = 0
+        st.session_state.mcq_attempts = {}
+        st.session_state.mcq_completed = False
+        st.session_state.mcq_correct_answers = 0
+        
+        # Switch to MCQ quiz page
+        st.session_state.current_page = "mcq_quiz"
+        st.rerun()
+    else:
+        st.error("Please select a topic first.")
 
 def get_topics():
     # get topics from sample-data/topics.json
@@ -14,13 +56,14 @@ def get_topics():
 all_topics = get_topics()
 
 # Initialize LLM service
+gpt_version = "gpt-4o-mini"  # Default version
+gpt_version = "gpt-4.1-mini"  # Use gpt-4.1-mini for now
 @st.cache_resource
 def get_llm_service():
     return LLMService(
         config_path=".env",
-        openai_api_version="2024-12-01-preview",
-        azure_deployment="gpt-4o-mini",
         temperature=0,
+        gpt_version=gpt_version
     )
 
 # Get LLM service instance
@@ -469,6 +512,7 @@ def main_chat_page():
     # Print current topic
 
     def start_chat():
+        st.session_state.current_page = "chat_page"
         # Clear existing messages
         st.session_state.messages = []
         
@@ -713,8 +757,8 @@ def main_chat_page():
                         st.rerun()  # Refresh to show the updated prompt
 
         # Create single Discussion interface
-        st.markdown("---")
-        col1, col2, col3= st.columns([1, 1,3])
+        #st.markdown("---")
+        col1, col2, col3, col4= st.columns([1, 1,1, 3])
         with col1:
             if "messages" not in st.session_state or len(st.session_state.messages) == 0:
                 start_button = st.button("Start Chat", key="start_discussion_btn", on_click=start_chat)
@@ -722,11 +766,16 @@ def main_chat_page():
                 start_button = st.button("Restart Chat", key="continue_discussion_btn", on_click=start_chat)
 
         with col2:
-            if "messages" not in st.session_state or len(st.session_state.messages) > 0:
+            if  st.session_state.current_page == "chat_page" and "messages" not in st.session_state or len(st.session_state.messages) > 0:
                 start_exercise = st.button("Start Practice", key="start_exercise_btn", on_click=start_exercise)
 
+        with col3: 
+            start_mcq = st.button("Start MCQ", key="start_mcq_btn",on_click=start_mcq_panel)
 
-        if "messages" in st.session_state and len(st.session_state.messages) > 0:
+        if st.session_state.current_page == "mcq_quiz":
+            # Replace the placeholder text with actual MCQ quiz display
+            display_mcq_quiz(all_topics)
+        elif st.session_state.current_page == "chat_page" and "messages" in st.session_state and len(st.session_state.messages) > 0:
             
             # Display chat messages from history on app rerun
             for message in st.session_state.messages:

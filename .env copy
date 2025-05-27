@@ -1,0 +1,6 @@
+#AZURE_OPENAI_ENDPOINT=https://gptutordev4.openai.azure.com
+#AZURE_OPENAI_API_KEY=53e2f25dee8a4fa08e35dd05748ef9f3
+[AZURE_OPENAI]
+AZURE_OPENAI_ENDPOINT = "https://gptutordev4.openai.azure.com/"
+AZURE_OPENAI_API_KEY = "53e2f25dee8a4fa08e35dd05748ef9f3"
+
