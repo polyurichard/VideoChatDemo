@@ -57,7 +57,7 @@ all_topics = get_topics()
 
 # Initialize LLM service
 gpt_version = "gpt-4o-mini"  # Default version
-gpt_version = "gpt-4.1-mini"  # Use gpt-4.1-mini for now
+#gpt_version = "gpt-4.1-mini"  # Use gpt-4.1-mini for now
 @st.cache_resource
 def get_llm_service():
     return LLMService(

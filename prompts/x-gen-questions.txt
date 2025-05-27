@@ -1,4 +1,12 @@
-Based on video contents, generate a list of topics that can be used to create a quiz or discussion questions. 
+Based on video contents, generate 10 questions.
+1. 1 question for each level of bloom taxaonomy: i.e. 
+   - remember, understand, apply, analyze, evaluate, create.
+2. 1 question for each of the following categories: 
+   - factual, conceptual, procedural, metacognitive.
+3. 1 question that tries to motivate the learner interest in the video.
+
+
+list of topics that can be used to create a quiz or discussion questions. 
 For each topic, provide detailed summary of the video content related to that topic.
 explain in easy to understand manner the contents of the video with citation of the corresponding timestamp.
 
@@ -37,4 +45,4 @@ Transcript:
 (08:16) the outcome of training differences can be seen depending on whether a model starts off training with values initialized to zeros versus some distribution of values and what that distribution is as you can see there are many considerations at this phase of training and it's important that you define what makes a model good enough for you otherwise we might find ourselves tweaking parameters for a very long time now these parameters are typically referred to as hyper parameters the adjustment or tuning of these hyper parameters still remains a bit more of an art than science and it's an experimental process that
 (08:51) heavily depends on the specifics of your data set model and training process once you're happy with your training and hyper parameters guided by the evaluation step it's finally time to use your model to do something useful machine learning is using data to answer questions so prediction or inference is that step where we finally get to answer some questions this is the point of all of this work where the value of machine learning is realized we can finally use our model to predict whether a given drink is wine or beer given its color and alcohol percentage the power of machine learning is that we were able to determine this
 (09:28) and how to differentiate between wine and beer using our model rather than using human judgment and manual rules you can extrapolate the ideas presented today to other problem domains as well where the same principles apply gathering data preparing that data choosing a model training it and evaluating it doing your hyper parameter tuning and finally prediction if you're looking for more ways to play with training and parameters check out the tensorflow playground it's a completely browser-based machine learning sandbox where you can try different parameters and run training against mock data sets and don't worry you can't break the site
-(10:05) of course we'll encounter more steps and nuances in future episodes but this serves as a good foundational framework to help us think through the problem giving us a common language to think about each step and go deeper in the future next time on ai adventures we will build our first real machine learning model using code no more drawing lines and going over algebra [Music] 
+(10:05) of course we'll encounter more steps and nuances in future episodes but this serves as a good foundational framework to help us think through the problem giving us a common language to think about each step and go deeper in the future next time on ai adventures we will build our first real machine learning model using code no more drawing lines and going over algebra 
