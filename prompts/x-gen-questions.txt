@@ -1,14 +1,18 @@
-Based on video contents, generate 10 questions.
-1. 1 question for each level of bloom taxaonomy: i.e. 
+Learning objective: understand machine learning.
+
+Based on video contents, generate questions. Each question should only have one question asked.
+1. personal: connect the user with the topic such as preference, opinion
+2. 3basic questions about the video
+3. 1 question for each level of bloom taxaonomy: i.e. 
    - remember, understand, apply, analyze, evaluate, create.
-2. interest: 1 question that tries to motivate the learner interest in the video.
+4. integration: a question that integrates the concepts from various part of the video.
 
 For each question, provide:
 - question text
 - question type (remember, understand, apply, analyze, evaluate, interest)
-- reference text: a list of the text in the video that the question is based corresponding citation of timestamp.
+- reference text: provide all the video sgements that is related to the question text or answer with citation of the timestamp.
 - answer/rubrics: the correct answer to question or rubrics for grading with a citation to the corresponding timestamp in video. Each item should have a point assigned to it (max: 5 points for each question)
-- hints: a list of hints
+- hints: a list of 3 hints without giving away the answer. The first hint should always be referring to the video timestamp containing the answer, the second hint should be a general hint, and the third hint should be a more specific hint.
 
 
 

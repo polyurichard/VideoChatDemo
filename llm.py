@@ -31,13 +31,13 @@ class LLMService:
                         # Set the environment variables for the Azure OpenAI endpoint and API key
                         openai_api_version="2024-12-01-preview"
                         azure_deployment="gpt-4o-mini"
-                        os.environ["AZURE_OPENAI_ENDPOINT"] = config["AZURE_OPENAI"]["AZURE_OPENAI_ENDPOINT"]
-                        os.environ["AZURE_OPENAI_API_KEY"] = config["AZURE_OPENAI"]["AZURE_OPENAI_API_KEY"]
+                        os.environ["AZURE_OPENAI_ENDPOINT"] = st.secrets["AZURE_OPENAI"]["AZURE_OPENAI_ENDPOINT"]
+                        os.environ["AZURE_OPENAI_API_KEY"] = st.secrets["AZURE_OPENAI"]["AZURE_OPENAI_API_KEY"]
                     elif gpt_version == "gpt-4.1-mini":
                         openai_api_version="2024-12-01-preview"
                         azure_deployment="gpt-4.1-mini"                
-                        os.environ["AZURE_OPENAI_ENDPOINT"] = config["AZURE_OPENAI"]["AZURE_OPENAI_ENDPOINT_41"]
-                        os.environ["AZURE_OPENAI_API_KEY"] = config["AZURE_OPENAI"]["AZURE_OPENAI_API_KEY_41"]
+                        os.environ["AZURE_OPENAI_ENDPOINT"] = st.secrets["AZURE_OPENAI"]["AZURE_OPENAI_ENDPOINT_41"]
+                        os.environ["AZURE_OPENAI_API_KEY"] = st.secrets["AZURE_OPENAI"]["AZURE_OPENAI_API_KEY_41"]
                 else:
                     raise ImportError("Streamlit secrets not configured with AZURE_OPENAI credentials")
             except ImportError as e:
