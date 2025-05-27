@@ -7,6 +7,33 @@ from question_bank import show_question_bank
 from welcome import welcome_page
 from mcq_quiz import display_mcq_quiz
 
+def get_topics():
+    # get topics from sample-data/topics.json
+    with open("sample-data/topics_with_q.json") as f:
+        topics = json.load(f)
+    return topics
+
+# Load topics data early before any functions that need it
+all_topics = get_topics()
+
+# Initialize LLM service
+gpt_version = "gpt-4o-mini"  # Default version
+#gpt_version = "gpt-4.1-mini"  # Use gpt-4.1-mini for now
+@st.cache_resource
+def get_llm_service():
+    return LLMService(
+        config_path=".env",
+        temperature=0,
+        gpt_version=gpt_version
+    )
+
+# Get LLM service instance
+llm_service = get_llm_service()
+
+# Initialize messages list if not in session state
+if "messages" not in st.session_state:
+    st.session_state.messages = []
+
 def start_mcq_panel():
     """
     Initialize the MCQ quiz for the selected topic.
@@ -47,33 +74,6 @@ def start_mcq_panel():
 
     else:
         st.error("Please select a topic first.")
-
-def get_topics():
-    # get topics from sample-data/topics.json
-    with open("sample-data/topics_with_q.json") as f:
-        topics = json.load(f)
-    return topics
-all_topics = get_topics()
-
-# Initialize LLM service
-gpt_version = "gpt-4o-mini"  # Default version
-#gpt_version = "gpt-4.1-mini"  # Use gpt-4.1-mini for now
-@st.cache_resource
-def get_llm_service():
-    return LLMService(
-        config_path=".env",
-        temperature=0,
-        gpt_version=gpt_version
-    )
-
-# Get LLM service instance
-llm_service = get_llm_service()
-
-# Initialize messages list if not in session state
-if "messages" not in st.session_state:
-    st.session_state.messages = []
-
-# print("start page")
 
 def extract_transcript(filename, start_timestamp, end_timestamp=None):
     """
@@ -148,16 +148,26 @@ def get_discussion_prompt():
             end_timestamp
         )
         
+        # Extract reference texts from questions for additional context
+        reference_texts = []
+        if "questions" in first_topic:
+            for question in first_topic["questions"]:
+                if "reference_text" in question and isinstance(question["reference_text"], list):
+                    for ref in question["reference_text"]:
+                        if "text" in ref and "timestamp" in ref:
+                            reference_texts.append(f"({ref['timestamp']}) {ref['text']}")
+        
         selected_topic_data = {
             "title": first_topic["title"],
             "required": first_topic.get("required", False),
             "learning_objectives": first_topic.get("learning_objectives", []),
-            "summary": first_topic.get("summary", ""),  # Add support for summary field
+            "summary": first_topic.get("summary", ""),
             "start_timestamp": first_topic.get("start_timestamp", ""),
             "end_timestamp": first_topic.get("end_timestamp", ""),
             "detailed_content": first_topic.get("detailed_content", []),
             "questions": first_topic.get("questions", []),
-            "transcript": transcript_text
+            "transcript": transcript_text,
+            "reference_texts": reference_texts  # Add extracted reference texts
         }
     
     # Read prompt template from file
@@ -180,10 +190,7 @@ def get_discussion_prompt():
     
     return prompt_template
 
-
-
 def calculate_total_points(topic_data):
-
     core_points = 0
     total_points = 0
     
@@ -199,6 +206,11 @@ def calculate_total_points(topic_data):
                     core_points += point_value
     
     return (core_points, total_points)
+
+def start_exercise():
+    """Start the practice session with AI assistance."""
+    st.session_state.start_exercise_clicked = True
+    print("Start exercise button clicked")  # Debugging line
 
 def update_topic_points(topic_title):
     """Update the points earned for a topic based on LLM evaluation of answers."""
@@ -303,7 +315,12 @@ def update_topic_points(topic_title):
             st.session_state.completed_topics_count += 1
         
         print(f"Updated points for {topic_title}: {new_points}/{st.session_state.topic_core_points.get(topic_title, 0)} (core) - {st.session_state.topic_total_points.get(topic_title, 100)} (total)")
-        print(f"Completed core topics: {st.session_state.completed_topics_count}/{len(core_topics)}")
+        
+        # Fix: Use st.session_state.core_topics instead of core_topics
+        if "core_topics" in st.session_state:
+            print(f"Completed core topics: {st.session_state.completed_topics_count}/{len(st.session_state.core_topics)}")
+        else:
+            print(f"Completed core topics: {st.session_state.completed_topics_count}/unknown")
 
 
 
@@ -320,7 +337,7 @@ def main_chat_page():
     topic_timestamps = {}
     topic_core_points = {}
     topic_total_points = {}
-    core_topics = []
+    core_topics = []  # This variable is local to main_chat_page
 
     for i in all_topics["topics"]:
         title = i["title"]
@@ -338,6 +355,9 @@ def main_chat_page():
         if is_required:
             core_topics.append(title)
 
+    # Store core_topics in session state so it's available in update_topic_points
+    st.session_state.core_topics = core_topics
+    
     # Initialize topic progress if not in session state
     if "topic_progress" not in st.session_state:
         st.session_state.topic_progress = {topic: 0 for topic in topics}
@@ -450,66 +470,10 @@ def main_chat_page():
         if st.button("💬 Chat", key="toggle_chat"):
             st.session_state.show_question_bank = False
             st.rerun()
- 
 
     # Add sidebar with metrics and progress - use the imported function
-    # Pass the required parameters to render_sidebar
     from sidebar import render_sidebar
     render_sidebar(all_topics, topic_timestamps, core_topics, youtube_url, extract_transcript, get_discussion_prompt)
-
-    def display_topic_details():
-            
-        # Display selected topic data at the top of the main content area
-        if st.session_state.selected_topic_data:
-            required_status = "Core" if st.session_state.selected_topic_data.get("required", False) else "Optional"
-            st.caption(f"Status: {required_status}")
-            
-            # Create tabs for different content (removed the Questions tab)
-            # overview_tab, transcript_tab, prompt_tab = st.tabs(["Overview", "Transcript", "Discussion Prompt"])
-            overview_tab, transcript_tab = st.tabs(["Overview", "Transcript"])
-            
-            with overview_tab:
-                # Display topic overview information
-                start = st.session_state.selected_topic_data.get("start_timestamp", "")
-                end = st.session_state.selected_topic_data.get("end_timestamp", "")
-                st.write(f"Timestamp: {start} - {end}")
-
-                if st.session_state.selected_topic_data.get("summary"):
-                    st.markdown("### Topic Summary")
-                    # Replace success alert with a customized background color using info alert
-                    st.info(st.session_state.selected_topic_data.get("summary"))
-                    
-                    # Alternative approach using custom HTML/CSS:
-                    # summary_text = st.session_state.selected_topic_data.get("summary")
-                    # st.markdown(
-                    #     f"""
-                    #     <div style="background-color:#e6f3ff; padding:15px; border-radius:5px; margin:10px 0;">
-                    #     {summary_text}
-                    #     </div>
-                    #     """, 
-                    #     unsafe_allow_html=True
-                    # )
-                
-
-                
-                if st.session_state.selected_topic_data.get("detailed_content"):
-                    st.markdown("### Detailed Content")
-                    for content_item in st.session_state.selected_topic_data.get("detailed_content", []):
-                        timestamp = content_item.get("timestamp", "")
-                        content = content_item.get("content", "")
-                        st.write(f"**({timestamp})** {content}")
-            
-            with transcript_tab:
-                # Display transcript
-                if "transcript" in st.session_state.selected_topic_data:
-                    st.markdown("### Transcript")
-                    st.text_area("Transcript", st.session_state.selected_topic_data["transcript"], 
-                                height=300, key="transcript_text", disabled=True, label_visibility="collapsed")
-            
-
-
-    # Add a button to start a discussion with this prompt
-    # Print current topic
 
     def start_chat():
         st.session_state.current_page = "chat_page"
@@ -520,153 +484,16 @@ def main_chat_page():
         st.session_state.message_count = 0
         
         # Add system message with the discussion prompt
-        system_message =  st.session_state.discussion_prompt
+        system_message = st.session_state.discussion_prompt
         msg = [
-            ("system",  system_message),
+            ("system", system_message),
             ("user", "Let's discuss this topic.")
         ]
         response = llm_service.send_message(msg)
-        #print(f"Response from LLM: {response}")  # Debugging line
-
 
         st.session_state.messages.append({"role": "system", "content": system_message})
         st.session_state.messages.append({"role": "user", "content": "Let's discuss this topic."})
         st.session_state.messages.append({"role": "assistant", "content": response})
-        
-
-    def update_topic_points(topic_title):
-        """Update the points earned for a topic based on LLM evaluation of answers."""
-        # Ensure we have enough messages for evaluation (at least the last user question and AI response)
-        if len(st.session_state.messages) < 3:
-            return
-        
-        # Get the last 4 messages if available (2 exchanges), otherwise get what we have
-        # Skip system messages as they're not part of the visible conversation
-        visible_messages = [msg for msg in st.session_state.messages if msg["role"] != "system"]
-        
-        # Get up to last 4 messages (or fewer if not available)
-        context_messages = visible_messages[-4:] if len(visible_messages) >= 4 else visible_messages
-        
-        print(f"---- Using {len(context_messages)} messages for evaluation:")  # Debugging line
-        print(context_messages)  # Debugging line
-        
-        # Format the conversation for the LLM evaluation in a plain text format
-        formatted_conversation = ""
-        for msg in context_messages:
-            role_prefix = "User: " if msg["role"] == "user" else "Assistant: "
-            formatted_conversation += f"{role_prefix}{msg['content']}\n"
-        
-        # Load the scoring prompt template
-        try:
-            with open("prompts/score_update.txt", "r") as f:
-                score_prompt = f.read()
-                # Replace the placeholder with the actual conversation
-                score_prompt = score_prompt.replace("{conversation}", formatted_conversation)
-        except Exception as e:
-            print(f"Error reading score update prompt: {str(e)}")
-            return
-        
-        # Call LLM to evaluate the conversation and determine points
-        evaluation = llm_service.send_message([("user", score_prompt)])
-        print("---- LLM evaluation prompt--:")  # Debugging line
-        print(score_prompt)  # Debugging line
-        print("--- Result ---")  # Debugging line
-        print(evaluation)  # Debugging line
-        
-        
-        # Extract the points from the LLM's response (expecting JSON)
-        try:
-            # Try to parse the response as JSON
-            evaluation_data = json.loads(evaluation.strip())
-            
-            # Extract score from the parsed JSON
-            points_earned = evaluation_data.get("score", 0)
-            user_input_type = evaluation_data.get("user_input_classification", "unknown")
-            
-            # Update question count if the user input was classified as a question
-            if user_input_type == "question":
-                st.session_state.question_count += 1
-                print(f"Question count updated: {st.session_state.question_count}")
-            
-            # Update correct answers count if user got points for their answer
-            if user_input_type == "answer" and points_earned > 0:
-                st.session_state.correct_answers_count += 1
-                print(f"Correct answers count updated: {st.session_state.correct_answers_count}")
-            
-            print(f"Points earned from LLM evaluation: {points_earned}")
-            print(f"User input classified as: {user_input_type}")
-            
-        except json.JSONDecodeError:
-            # If JSON parsing fails, try to extract just a number as fallback
-            print(f"Could not parse JSON from LLM response. Trying to extract just the number.")
-            try:
-                # Look for digits in the response
-                import re
-                match = re.search(r'\d+', evaluation)
-                if match:
-                    points_earned = int(match.group())
-                    print(f"Extracted points from text: {points_earned}")
-                else:
-                    points_earned = 0
-                    print("No numeric value found in response.")
-            except Exception as e:
-                print(f"Error extracting score: {str(e)}")
-                points_earned = 0
-        except Exception as e:
-            # Handle any other errors
-            print(f"Error processing evaluation response: {str(e)}")
-            points_earned = 0
-        
-        # Update the points in the session state
-        if "topic_points" in st.session_state:
-            current_points = st.session_state.topic_points.get(topic_title, 0)
-            st.session_state.topic_points[topic_title] = min(
-                current_points + points_earned, 
-                st.session_state.topic_total_points.get(topic_title, 100)  # Cap at max points
-            )
-            
-            # Check if this is a core topic and if all core questions are answered
-            new_points = st.session_state.topic_points[topic_title]
-            core_points = st.session_state.topic_core_points.get(topic_title, 0)
-            is_required = st.session_state.selected_topic_data.get("required", False)
-            
-            # Topic is completed if it's earned at least as many points as core questions are worth
-            if is_required and current_points < core_points and new_points >= core_points:
-                # This core topic just became completed
-                st.session_state.completed_topics_count += 1
-            
-            print(f"Updated points for {topic_title}: {new_points}/{st.session_state.topic_core_points.get(topic_title, 0)} (core) - {st.session_state.topic_total_points.get(topic_title, 100)} (total)")
-            print(f"Completed core topics: {st.session_state.completed_topics_count}/{len(core_topics)}")
-
-
-    def start_exercise():
-        st.session_state.start_exercise_clicked = True
-        print("Start exercise button clicked")  # Debugging line
-        
-
-
-
-    # handle the start exercise button click
-    if "start_exercise_clicked" in st.session_state:
-        user_input = "Let's start the practice session."
-        st.session_state.messages.append({"role": "user", "content": user_input})
-
-        formatted_messages = []
-        for msg in st.session_state.messages:
-            if msg["role"] == "user":
-                formatted_messages.append(("user", msg["content"]))
-            elif msg["role"] == "assistant":
-                formatted_messages.append(("assistant", msg["content"]))
-            elif msg["role"] == "system":
-                formatted_messages.append(("system", msg["content"]))
-                        
-        response = llm_service.send_message(formatted_messages)   
-        # response = " mock result from start exercise"
-        st.session_state.messages.append({"role": "assistant", "content": response})
-        # remove the key from session state
-        del st.session_state.start_exercise_clicked
-
-
 
     # Check if Question Bank should be shown
     if st.session_state.show_question_bank:
@@ -683,24 +510,25 @@ def main_chat_page():
         timestamp = st.session_state.selected_topic_data.get("start_timestamp", "00:00")
         
         # Create a row with topic title and play button
-        title_col, play_col = st.columns([3, 1])
         st.subheader(f"Topic: {topic_title}")
             
-        
         # Display topic info in tabs directly instead of using an expander
         if st.session_state.selected_topic_data:
-            # Create tabs for different content (removed the Questions tab)
-            overview_tab, transcript_tab = st.tabs(["Overview", "Transcript"])
+            # Create tabs for different content - added a new Questions tab
+            overview_tab, transcript_tab, questions_tab = st.tabs(["Overview", "Transcript", "Questions"])
             
             with overview_tab:
                 # Display topic overview information
                 start = st.session_state.selected_topic_data.get("start_timestamp", "")
                 end = st.session_state.selected_topic_data.get("end_timestamp", "")
                 st.write(f"Timestamp: {start} - {end}")
-
                 
+                # Show detailed_summary
+
+
+
                 # Add a button to play the video at the topic's timestamp
-                if st.button("▶️ Play Video", key="play_video_btn"):
+                if st.button("▶️ View Video", key="play_video_btn"):
                     # Set timestamp and autoplay flag
                     st.session_state.clicked_timestamp = True
                     parts = timestamp.split(":")
@@ -712,16 +540,11 @@ def main_chat_page():
                         t = int(timestamp)
                     st.session_state.selected_timestamp = t
                     st.rerun()  # Refresh to start video
-        
-
                 
-
                 if st.session_state.selected_topic_data.get("summary"):
                     st.markdown("### Topic Summary")
-                    # Replace success alert with a customized background color using info alert
+                    # Display summary in info box
                     st.info(st.session_state.selected_topic_data.get("summary"))
-                    
-
                 
                 if st.session_state.selected_topic_data.get("detailed_content"):
                     st.markdown("### Detailed Content")
@@ -736,85 +559,168 @@ def main_chat_page():
                     st.markdown("### Transcript")
                     st.text_area("Transcript", st.session_state.selected_topic_data["transcript"], 
                                 height=300, key="transcript_text", disabled=True, label_visibility="collapsed")
-  
-                
-                # Add buttons for saving changes or resetting to default
-                col1, col2 = st.columns([1, 1])
-                with col1:
-                    if st.button("Save Changes", key="save_prompt_btn"):
-                        # Update the prompt in session state
-                        st.session_state.discussion_prompt = edited_prompt
-                        st.session_state.edited_prompt = edited_prompt
-                        st.success("Prompt updated successfully!")
-                
-                with col2:
-                    if st.button("Reset to Default", key="reset_prompt_btn"):
-                        # Re-generate the default prompt
-                        default_prompt = get_discussion_prompt()
-                        st.session_state.discussion_prompt = default_prompt
-                        st.session_state.edited_prompt = default_prompt
-                        st.success("Prompt reset to default!")
-                        st.rerun()  # Refresh to show the updated prompt
-
-        # Create single Discussion interface
-        #st.markdown("---")
-        col1, col2, col3, col4= st.columns([1, 1,1, 3])
-        with col1:
-            if "messages" not in st.session_state or len(st.session_state.messages) == 0:
-                start_button = st.button("Start Chat", key="start_discussion_btn", on_click=start_chat)
-            else:
-                start_button = st.button("Restart Chat", key="continue_discussion_btn", on_click=start_chat)
-
-        with col2:
-            if  st.session_state.current_page == "chat_page" and "messages" not in st.session_state or len(st.session_state.messages) > 0:
-                start_exercise = st.button("Start Practice", key="start_exercise_btn", on_click=start_exercise)
-
-        with col3: 
-            start_mcq = st.button("Start MCQ", key="start_mcq_btn",on_click=start_mcq_panel)
-
-        if st.session_state.current_page == "mcq_quiz":
-            # Replace the placeholder text with actual MCQ quiz display
-            display_mcq_quiz(all_topics)
-        elif st.session_state.current_page == "chat_page" and "messages" in st.session_state and len(st.session_state.messages) > 0:
             
-            # Display chat messages from history on app rerun
-            for message in st.session_state.messages:
-                if message["role"] != "system": #hide the system message in chat
-                    with st.chat_message(message["role"]):
-                        st.markdown(message["content"])
-
-            user_input = st.chat_input("Input your message here...")
-            
-
-            if user_input:
-                # Add user message to chat history
-                st.session_state.messages.append({"role": "user", "content": user_input})
-                # Update message count when user sends a message
-                st.session_state.message_count += 1
-                
-                with st.chat_message("user"):
-                    st.markdown(user_input)        
-                formatted_messages = []
-                for msg in st.session_state.messages:
-                    if msg["role"] == "user":
-                        formatted_messages.append(("user", msg["content"]))
-                    elif msg["role"] == "assistant":
-                        formatted_messages.append(("assistant", msg["content"]))
-                    elif msg["role"] == "system":
-                        formatted_messages.append(("system", msg["content"]))
+            # Added new Questions tab with two-column layout - without any expanders
+            with questions_tab:
+                # Display questions - handling the new structure
+                if st.session_state.selected_topic_data.get("questions"):
+                    st.markdown("### Topic Questions")
+                    questions = st.session_state.selected_topic_data.get("questions", [])
+                    
+                    # Group questions by nature for better organization
+                    question_by_nature = {}
+                    for q in questions:
+                        nature = q.get("question_nature", "Other")
+                        if nature not in question_by_nature:
+                            question_by_nature[nature] = []
+                        question_by_nature[nature].append(q)
+                    
+                    # Display questions by nature directly without expanders
+                    for nature, q_list in question_by_nature.items():
+                        st.markdown(f"## {nature.title()} Questions ({len(q_list)})")
+                        
+                        for idx, q in enumerate(q_list):
+                            # Create two columns for question and answer
+                            q_col, a_col = st.columns([2, 3])
                             
-                response = llm_service.send_message(formatted_messages)
-                # response = "Mock 2"
+                            with q_col:
+                                # Add badge to show if question is required
+                                required_badge = "🔴 Required" if q.get("required", False) else "⚪ Optional"
+                                st.markdown(f"**Q{idx+1}: {q.get('question')}** <span style='color: {'red' if q.get('required', False) else 'gray'}; font-size: 0.8em;'>{required_badge}</span>", unsafe_allow_html=True)
+                                
+                                # Display MCQ options if question is MCQ type
+                                if q.get("type") == "mcq":
+                                    options = q.get("options", [])
+                                    correct_answer = q.get("correct_answer", "")
+                                    st.markdown("**Options:**")
+                                    for i, option in enumerate(options):
+                                        is_correct = option == correct_answer
+                                        # Use a checkmark for the correct answer
+                                        option_marker = "✅" if is_correct else f"{i+1}."
+                                        st.markdown(f"{option_marker} {option}")
+                            
+                            with a_col:
+                                
+                                # Handle different answer formats based on question type
+                                if q.get("type") == "mcq":
+                                    st.markdown(f"**Correct Answer:** {q.get('correct_answer', '')}")
+                                    if q.get("explanation"):
+                                        st.markdown(f"**Explanation:** {q.get('explanation')}")
+                                elif q.get("type") == "short_question":
+                                    # Properly handle short_question answers
+                                    if isinstance(q.get("answer"), list):
+                                        st.markdown("**Grading Criteria:**")
+                                        for criterion in q.get("answer", []):
+                                            st.markdown(f"- {criterion.get('criteria', '')}: {criterion.get('points', 0)} points")
+                                    else:
+                                        st.markdown(f"**Answer:** {q.get('answer', '')}")
+                                elif isinstance(q.get("answer"), list):
+                                    # Ensure list-type answers are displayed as grading criteria
+                                    st.markdown("**Grading Criteria:**")
+                                    for criterion in q.get("answer", []):
+                                        st.markdown(f"- {criterion.get('criteria', '')}: {criterion.get('points', 0)} points")
+                                else:
+                                    # Handle any other formats
+                                    st.markdown(f"**Answer:** {q.get('answer', '')}")
+                                
+                                # Always display hints for all question types
+                                if q.get("hints"):
+                                    st.markdown("**Hints:**")
+                                    for i, hint in enumerate(q.get("hints", [])):
+                                        st.markdown(f"- **Hint {i+1}:** {hint}")
+                                
+                                # Display reference texts if available
+                                if q.get("reference_text"):
+                                    st.markdown("**Reference Text:**")
+                                    for ref in q.get("reference_text", []):
+                                        st.markdown(f"- **({ref.get('timestamp', '')})** {ref.get('text', '')}")
 
-                st.session_state.messages.append({"role": "assistant", "content": response})
-                with st.chat_message("assistant"):
-                    st.markdown(response)
-                
-                update_topic_points(st.session_state.selected_topic_data.get("title", ""))
-                st.rerun()
+                        # Add extra spacing between question categories
+                        if nature != list(question_by_nature.keys())[-1]:
+                            st.markdown("<br><br>", unsafe_allow_html=True)
+                else:
+                    st.info("No questions available for this topic.")
 
-
+        # Create discussion interface - MOVED THIS SECTION TO INSIDE THE OVERVIEW TAB
+        with overview_tab:
+            # Display chat interface after the content
+            st.markdown("### Discussion")
             
+            col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
+            with col1:
+                if "messages" not in st.session_state or len(st.session_state.messages) == 0:
+                    start_button = st.button("Start Chat", key="start_discussion_btn", on_click=start_chat)
+                else:
+                    start_button = st.button("Restart Chat", key="continue_discussion_btn", on_click=start_chat)
+
+            with col2:
+                if st.session_state.current_page == "chat_page" and ("messages" not in st.session_state or len(st.session_state.messages) > 0):
+                    start_exercise_button = st.button("Start Practice", key="start_exercise_btn", on_click=start_exercise)
+
+            with col3: 
+                start_mcq_button = st.button("Start MCQ", key="start_mcq_btn", on_click=start_mcq_panel)
+            
+            # Show chat messages only in the overview tab
+            if st.session_state.current_page == "chat_page" and "messages" in st.session_state and len(st.session_state.messages) > 0:
+                # Display chat messages from history on app rerun
+                for message in st.session_state.messages:
+                    if message["role"] != "system": #hide the system message in chat
+                        with st.chat_message(message["role"]):
+                            st.markdown(message["content"])
+
+                user_input = st.chat_input("Input your message here...")
+                
+                if user_input:
+                    # Add user message to chat history
+                    st.session_state.messages.append({"role": "user", "content": user_input})
+                    # Update message count when user sends a message
+                    st.session_state.message_count += 1
+                    
+                    with st.chat_message("user"):
+                        st.markdown(user_input)        
+                    formatted_messages = []
+                    for msg in st.session_state.messages:
+                        if msg["role"] == "user":
+                            formatted_messages.append(("user", msg["content"]))
+                        elif msg["role"] == "assistant":
+                            formatted_messages.append(("assistant", msg["content"]))
+                        elif msg["role"] == "system":
+                            formatted_messages.append(("system", msg["content"]))
+                                
+                    response = llm_service.send_message(formatted_messages)
+
+                    st.session_state.messages.append({"role": "assistant", "content": response})
+                    with st.chat_message("assistant"):
+                        st.markdown(response)
+                    
+                    update_topic_points(st.session_state.selected_topic_data.get("title", ""))
+                    st.rerun()
+
+        # Handle the start exercise button click (KEEP THIS OUTSIDE THE TAB)
+        if "start_exercise_clicked" in st.session_state:
+            user_input = "Let's start the practice session."
+            st.session_state.messages.append({"role": "user", "content": user_input})
+
+            formatted_messages = []
+            for msg in st.session_state.messages:
+                if msg["role"] == "user":
+                    formatted_messages.append(("user", msg["content"]))
+                elif msg["role"] == "assistant":
+                    formatted_messages.append(("assistant", msg["content"]))
+                elif msg["role"] == "system":
+                    formatted_messages.append(("system", msg["content"]))
+                    
+            response = llm_service.send_message(formatted_messages)
+            st.session_state.messages.append({"role": "assistant", "content": response})
+            # remove the key from session state
+            del st.session_state.start_exercise_clicked
+            st.rerun()
+
+        # Display MCQ quiz if in MCQ mode
+        if st.session_state.current_page == "mcq_quiz":
+            # Display MCQ quiz
+            display_mcq_quiz(all_topics)
+
 # Main code - determine which page to show
 if st.session_state.current_page == "welcome":
     welcome_page()

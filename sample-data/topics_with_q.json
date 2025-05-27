@@ -5,493 +5,1773 @@
       "required": true,
       "start_timestamp": "00:01",
       "end_timestamp": "00:39",
-      "summary": "This topic introduces the concept of machine learning, highlighting its ability to give computers new abilities such as detecting skin cancer or sorting cucumbers. It sets up the main task of building a model that can distinguish between wine and beer, introducing the concepts of 'model' and 'training.'",
+      "summary": "The video starts by explaining that machine learning gives computers new abilities, like detecting skin cancer or sorting cucumbers. It introduces the idea of a 'model'—a system built to answer questions (e.g., whether a drink is wine or beer)—and the process of 'training' the model to improve its accuracy.",
       "questions": [
         {
-          "type": "discussion",
+          "type": "open-ended",
+          "question_nature": "personal_experience",
           "required": true,
-          "question": "Which real-world application of machine learning do you think is most impactful and why?",
+          "question": "Have you ever noticed a technology that learns from data (like recommendations on streaming services)? Describe your experience and how you think it works.",
           "point_value": 2,
-          "evaluation_criteria": "Student identifies a real-world application mentioned in the video (e.g., skin cancer detection, sorting cucumbers, escalator repair) or another valid example, and explains their reasoning.",
-          "reference_timestamp": "00:01"
-        },
-        {
-          "type": "mcq",
-          "required": true,
-          "question": "What is the main purpose of 'training' in machine learning?",
-          "point_value": 1,
-          "options": [
-            "To collect more data",
-            "To create a model that answers questions correctly",
-            "To choose the best features",
-            "To evaluate the model's performance"
+          "reference_text": [
+            {
+              "text": "from detecting skin cancer to sorting cucumbers to detecting escalators in need of repair machine learning has granted computer systems entirely new abilities",
+              "timestamp": "00:01"
+            }
           ],
-          "correct_answer": "To create a model that answers questions correctly",
-          "explanation": "Training is the process of building a model that can accurately answer questions based on data.",
+          "answer": [
+            {
+              "criteria": "Mentions a specific technology or instance where machine learning is used",
+              "points": 1
+            },
+            {
+              "criteria": "Provides a thoughtful reflection or personal connection to how it works",
+              "points": 1
+            }
+          ],
           "hints": [
-            "Think about what happens after collecting data.",
-            "Training creates something using the data.",
-            "The goal is to answer questions accurately."
+            "Review the introduction around 00:01 for examples of machine learning in everyday tech.",
+            "Think about recommendation systems or smart assistants you use.",
+            "Try relating your personal experience with how the technology adapts based on your usage."
           ],
-          "reference_timestamp": "00:39"
+          "explanation": ""
         },
         {
-          "type": "short",
+          "type": "short_question",
+          "question_nature": "basic",
           "required": true,
-          "question": "What is a 'model' in the context of machine learning?",
-          "point_value": 2,
-          "sample_answer": "A model is a system built to answer questions using data, such as deciding if a drink is wine or beer.",
-          "explanation": "In machine learning, a model is the result of training and is used to make predictions or answer questions.",
-          "hints": [
-            "It's something created during training.",
-            "It helps answer questions.",
-            "It uses data to make decisions."
-          ],
-          "reference_timestamp": "00:39"
-        },
-        {
-          "type": "reflective",
-          "required": true,
-          "question": "How might machine learning change the way we solve traditional problems?",
+          "question": "What is a 'model' in the context of machine learning as explained in this topic?",
           "point_value": 3,
-          "sample_answer": "Machine learning allows us to solve problems by learning from data instead of relying solely on hand-crafted rules, making solutions more adaptive and scalable.",
-          "explanation": "By using data to learn patterns, machine learning provides new ways to automate and improve upon traditional problem-solving approaches.",
-          "hints": [
-            "Think about traditional coding vs learning from data.",
-            "Consider adaptability.",
-            "How can this approach handle complex tasks?"
+          "reference_text": [
+            {
+              "text": "this model is created via a process called training machine learning the goal of training is to create an accurate model that answers our questions correctly most of the time",
+              "timestamp": "00:39"
+            }
           ],
-          "reference_timestamp": "00:01-00:39"
+          "answer": [
+            {
+              "criteria": "Identifies the model as a system built to answer a specific question (e.g., identifying wine vs. beer)",
+              "points": 2
+            },
+            {
+              "criteria": "Mentions that the model is created through a process called training",
+              "points": 1
+            }
+          ],
+          "hints": [
+            "Refer to the segment around 00:39 in the video.",
+            "Recall that the model is described as the system which makes predictions.",
+            "Make sure to mention that training is used to build this model."
+          ],
+          "explanation": ""
+        },
+        {
+          "type": "short_question",
+          "question_nature": "basic",
+          "required": false,
+          "question": "What is the main goal of training a machine learning model according to the video?",
+          "point_value": 3,
+          "reference_text": [
+            {
+              "text": "the goal of training is to create an accurate model that answers our questions correctly most of the time",
+              "timestamp": "00:39"
+            }
+          ],
+          "answer": [
+            {
+              "criteria": "States that the goal is to create an accurate model",
+              "points": 2
+            },
+            {
+              "criteria": "Mentions that the model answers questions correctly most of the time",
+              "points": 1
+            }
+          ],
+          "hints": [
+            "Look at the explanation near the end of the 00:39 timestamp.",
+            "Focus on accuracy and correct predictions.",
+            "Mention that the training process aims to enhance the model's predictive accuracy."
+          ],
+          "explanation": ""
+        },
+        {
+          "type": "short_question",
+          "question_nature": "remember",
+          "required": false,
+          "question": "List one key ability that machine learning provides to computers as mentioned in this segment.",
+          "point_value": 3,
+          "reference_text": [
+            {
+              "text": "from detecting skin cancer to sorting cucumbers to detecting escalators in need of repair machine learning has granted computer systems entirely new abilities",
+              "timestamp": "00:01"
+            }
+          ],
+          "answer": [
+            {
+              "criteria": "Mentions any one of the abilities: detecting skin cancer, sorting cucumbers, or detecting escalators in need of repair",
+              "points": 3
+            }
+          ],
+          "hints": [
+            "Review the first few seconds of the video (00:01).",
+            "Focus on one of the examples given.",
+            "Choose an ability such as detecting skin cancer or sorting cucumbers."
+          ],
+          "explanation": ""
+        },
+        {
+          "type": "open-ended",
+          "question_nature": "understand",
+          "required": false,
+          "question": "Explain in your own words what it means to 'train' a model in machine learning.",
+          "point_value": 4,
+          "reference_text": [
+            {
+              "text": "this model is created via a process called training machine learning the goal of training is to create an accurate model",
+              "timestamp": "00:39"
+            }
+          ],
+          "answer": [
+            {
+              "criteria": "Explains that training involves adjusting the model's parameters to improve predictions",
+              "points": 2
+            },
+            {
+              "criteria": "Mentions that the process is iterative and seeks to achieve accuracy",
+              "points": 2
+            }
+          ],
+          "hints": [
+            "Refer to the explanation provided around 00:39.",
+            "Think about how a model learns from its mistakes.",
+            "Mention that training adjusts parameters so the model makes better predictions over time."
+          ],
+          "explanation": ""
+        },
+        {
+          "type": "open-ended",
+          "question_nature": "apply",
+          "required": false,
+          "question": "Imagine you have a computer that needs to classify different kinds of fruits. How would you apply the concept of a 'model' from the video to solve this problem?",
+          "point_value": 4,
+          "reference_text": [
+            {
+              "text": "let's pretend that we've been asked to create a system that answers the question of whether a drink is wine or beer",
+              "timestamp": "00:01-00:39"
+            }
+          ],
+          "answer": [
+            {
+              "criteria": "Describes setting up a model to classify fruits, similar to distinguishing wine vs. beer",
+              "points": 2
+            },
+            {
+              "criteria": "Mentions collecting data on fruit features and training the model on these features",
+              "points": 2
+            }
+          ],
+          "hints": [
+            "Review the overall process explained from 00:01 to 00:39.",
+            "Focus on how the model was built for drinks and adapt that idea for fruits.",
+            "Discuss data collection, training, and using the model for prediction in the context of fruits."
+          ],
+          "explanation": ""
+        },
+        {
+          "type": "open-ended",
+          "question_nature": "analyze",
+          "required": false,
+          "question": "Analyze why comparing the model's predictions with the actual results is crucial during training.",
+          "point_value": 4,
+          "reference_text": [
+            {
+              "text": "we can compare our model's predictions with the output that it should have produced and adjust the values in w and b",
+              "timestamp": "05:04-06:24"
+            }
+          ],
+          "answer": [
+            {
+              "criteria": "Explains that the comparison helps identify errors in the model's predictions",
+              "points": 2
+            },
+            {
+              "criteria": "Mentions that comparing predictions to actual outcomes guides adjustments to improve model accuracy",
+              "points": 2
+            }
+          ],
+          "hints": [
+            "Think back to the description of training in the video around 05:04-06:24.",
+            "Focus on how feedback is used to refine the model.",
+            "Explain that this comparison is the basis for updating the model parameters."
+          ],
+          "explanation": ""
+        },
+        {
+          "type": "open-ended",
+          "question_nature": "evaluate",
+          "required": false,
+          "question": "Evaluate the impact of the training process on the overall performance of a machine learning model.",
+          "point_value": 4,
+          "reference_text": [
+            {
+              "text": "once training is complete it's time to see if the model is any good using evaluation",
+              "timestamp": "06:24-07:01"
+            }
+          ],
+          "answer": [
+            {
+              "criteria": "Highlights that proper training directly improves prediction accuracy",
+              "points": 2
+            },
+            {
+              "criteria": "Discusses that effective training leads to a more reliable model in real-world scenarios",
+              "points": 2
+            }
+          ],
+          "hints": [
+            "Refer to the segment around 06:24 that discusses evaluation after training.",
+            "Consider how training transforms initial random guesses into informed predictions.",
+            "Discuss both the benefits of rigorous training and any potential limitations if training is insufficient."
+          ],
+          "explanation": ""
+        },
+        {
+          "type": "open-ended",
+          "question_nature": "create",
+          "required": false,
+          "question": "Propose an alternative example (different from the wine vs. beer scenario) to illustrate how a model is trained in machine learning.",
+          "point_value": 4,
+          "reference_text": [
+            {
+              "text": "let's pretend that we've been asked to create a system that answers the question of whether a drink is wine or beer",
+              "timestamp": "00:01-00:39"
+            }
+          ],
+          "answer": [
+            {
+              "criteria": "Introduces a clear alternative example (e.g., classifying emails as spam or not spam, or recognizing handwritten digits)",
+              "points": 2
+            },
+            {
+              "criteria": "Explains the training process within the context of the new example",
+              "points": 2
+            }
+          ],
+          "hints": [
+            "Think of another classification problem outside of drinks.",
+            "Outline the steps of collecting data, training a model, and using it for predictions in your example.",
+            "Ensure that your example clearly relates to the process of training described in the video."
+          ],
+          "explanation": ""
+        },
+        {
+          "type": "open-ended",
+          "question_nature": "integration",
+          "required": false,
+          "question": "How do the concepts of data, model, and training integrate to enable practical machine learning applications?",
+          "point_value": 4,
+          "reference_text": [
+            {
+              "text": "we can finally use our model to predict whether a given drink is wine or beer ... the value of machine learning is that we were able to determine this and how to differentiate between wine and beer using our model",
+              "timestamp": "09:28-10:05"
+            }
+          ],
+          "answer": [
+            {
+              "criteria": "Describes how data collection provides the inputs, training builds the model, and evaluation verifies its performance",
+              "points": 2
+            },
+            {
+              "criteria": "Mentions that this integration allows for practical applications beyond the specific example",
+              "points": 2
+            }
+          ],
+          "hints": [
+            "Revisit the segments on data collection and training.",
+            "Focus on how these parts collaborate to produce a working model.",
+            "Explain that without quality data or proper training, the model would not perform effectively in real-world tasks."
+          ],
+          "explanation": ""
         },
         {
           "type": "mcq",
+          "question_nature": "remember",
           "required": false,
-          "question": "Which of the following is NOT mentioned as an application of machine learning in the video?",
-          "point_value": 1,
+          "question": "Which of the following is NOT mentioned as one of the computer abilities granted by machine learning?",
+          "point_value": 2,
           "options": [
             "Detecting skin cancer",
             "Sorting cucumbers",
-            "Detecting escalators needing repair",
-            "Translating languages"
+            "Detecting escalators in need of repair",
+            "Playing chess"
           ],
-          "correct_answer": "Translating languages",
-          "explanation": "The video only mentions detecting skin cancer, sorting cucumbers, and detecting escalators needing repair.",
+          "correct_answer": "Playing chess",
+          "reference_text": [
+            {
+              "text": "from detecting skin cancer to sorting cucumbers to detecting escalators in need of repair",
+              "timestamp": "00:01"
+            }
+          ],
+          "answer": [
+            {
+              "criteria": "Identifies that playing chess is not mentioned in the video segment",
+              "points": 2
+            }
+          ],
           "hints": [
-            "Recall the first examples given.",
-            "Some options are not in the video.",
-            "One is a common ML task but not mentioned here."
+            "Check the opening segment around 00:01.",
+            "Recall the examples given for machine learning abilities.",
+            "Notice that playing chess is not listed among the examples."
           ],
-          "reference_timestamp": "00:01"
+          "explanation": "The video mentions detecting skin cancer, sorting cucumbers, and detecting escalators in need of repair, but it does not mention playing chess."
         },
         {
-          "type": "short",
+          "type": "mcq",
+          "question_nature": "remember",
           "required": false,
-          "question": "Why might it be important for a model to 'answer correctly most of the time' rather than always?",
+          "question": "What is the process of creating a model called?",
           "point_value": 2,
-          "sample_answer": "Because real-world data can be unpredictable or noisy, so perfect accuracy is often unrealistic; the goal is to perform well in most cases.",
-          "explanation": "Models must generalize to new data, and it's normal for some errors to occur due to limitations in data or problem complexity.",
-          "hints": [
-            "Think about real-world unpredictability.",
-            "Is perfect accuracy possible?",
-            "What matters is general performance."
+          "options": [
+            "Evaluation",
+            "Training",
+            "Data Collection",
+            "Prediction"
           ],
-          "reference_timestamp": "00:39"
+          "correct_answer": "Training",
+          "reference_text": [
+            {
+              "text": "this model is created via a process called training",
+              "timestamp": "00:39"
+            }
+          ],
+          "answer": [
+            {
+              "criteria": "Selects 'Training' as the process of creating the model",
+              "points": 2
+            }
+          ],
+          "hints": [
+            "Review the explanation provided at 00:39.",
+            "Focus on the term used to describe building the model.",
+            "Remember that training adjusts the model to make accurate predictions."
+          ],
+          "explanation": "The video clearly states that the model is built through a process called training."
         }
       ]
     },
     {
-      "title": "Data Collection Process",
+      "title": "Data Collection",
       "required": true,
       "start_timestamp": "00:39",
       "end_timestamp": "01:54",
-      "summary": "This topic covers how to collect data for machine learning. It focuses on selecting useful features (like color and alcohol content for drinks), using measurement equipment, and understanding why quality and quantity of data matter.",
+      "summary": "This segment explains the importance of data for training models. Data is collected from glasses of wine and beer by measuring two main features: the color (measured as a wavelength) and the alcohol content (measured as a percentage). The video emphasizes that both the quality and quantity of the data are crucial for building an effective model.",
       "questions": [
         {
-          "type": "discussion",
+          "type": "open-ended",
+          "question_nature": "personal_experience",
           "required": true,
-          "question": "What are some challenges you might face when collecting data for a machine learning project?",
+          "question": "Have you ever had to collect or handle data for a project? Describe your experience and any challenges you faced.",
           "point_value": 2,
-          "evaluation_criteria": "Student mentions challenges such as data quality, selecting relevant features, collecting enough samples, or measuring accurately.",
-          "reference_timestamp": "00:39-01:54"
-        },
-        {
-          "type": "mcq",
-          "required": true,
-          "question": "Which two features were chosen to help distinguish between wine and beer?",
-          "point_value": 1,
-          "options": [
-            "Foam amount and glass shape",
-            "Color and alcohol content",
-            "Price and brand",
-            "Country of origin and vintage"
+          "reference_text": [
+            {
+              "text": "gathering that data ... the quality and quantity of data that you gather will directly determine how good your predictive model can be",
+              "timestamp": "01:18-01:54"
+            }
           ],
-          "correct_answer": "Color and alcohol content",
-          "explanation": "The video specifically mentions measuring color (wavelength) and alcohol content (percentage) to distinguish between wine and beer.",
+          "answer": [
+            {
+              "criteria": "Describes a personal experience with data collection",
+              "points": 1
+            },
+            {
+              "criteria": "Mentions specific challenges or observations about data quality or quantity",
+              "points": 1
+            }
+          ],
           "hints": [
-            "Consider what can be measured easily.",
-            "The answer is in the first step of data collection.",
-            "It's about the drink's physical properties."
+            "Consider any academic projects, work tasks, or personal ventures involving data.",
+            "Think about issues such as missing data or inaccuracies.",
+            "Discuss how the experience reflects the importance of good data quality as mentioned in the video."
           ],
-          "reference_timestamp": "00:39-01:18"
+          "explanation": ""
         },
         {
-          "type": "short",
+          "type": "short_question",
+          "question_nature": "basic",
           "required": true,
-          "question": "What equipment is suggested for measuring the features of wine and beer?",
-          "point_value": 2,
-          "sample_answer": "A spectrometer for color and a hydrometer for alcohol content.",
-          "explanation": "These tools are used to measure the two selected features as described in the video.",
-          "hints": [
-            "Think about how you measure color and alcohol.",
-            "Two pieces of equipment were bought.",
-            "One measures light, one measures density."
-          ],
-          "reference_timestamp": "01:18"
-        },
-        {
-          "type": "reflective",
-          "required": true,
-          "question": "Why is the quality and amount of collected data so important for machine learning models?",
+          "question": "What are the two features measured to distinguish between wines and beers in the video?",
           "point_value": 3,
-          "sample_answer": "Good quality and a sufficient amount of data ensure the model can learn accurate patterns and make reliable predictions.",
-          "explanation": "Poor or insufficient data can lead to inaccurate models that fail in real situations.",
-          "hints": [
-            "Think about what the model learns from.",
-            "What happens if data is poor?",
-            "How does more data help?"
+          "reference_text": [
+            {
+              "text": "we'll just pick two simple ones the color as a wavelength of light and the alcohol content as a percentage",
+              "timestamp": "01:18-01:54"
+            }
           ],
-          "reference_timestamp": "01:54"
+          "answer": [
+            {
+              "criteria": "Identifies 'color' as one feature",
+              "points": 1
+            },
+            {
+              "criteria": "Identifies 'alcohol content' as the second feature",
+              "points": 2
+            }
+          ],
+          "hints": [
+            "Review the segment between 01:18 and 01:54.",
+            "Focus on the specific characteristics mentioned.",
+            "Remember that the video emphasizes both color and alcohol content."
+          ],
+          "explanation": ""
+        },
+        {
+          "type": "short_question",
+          "question_nature": "basic",
+          "required": false,
+          "question": "Why is the quality and amount of data important for training a machine learning model?",
+          "point_value": 3,
+          "reference_text": [
+            {
+              "text": "the quality and quantity of data that you gather will directly determine how good your predictive model can be",
+              "timestamp": "01:54"
+            }
+          ],
+          "answer": [
+            {
+              "criteria": "States that higher quality and more data lead to more accurate models",
+              "points": 2
+            },
+            {
+              "criteria": "Mentions that insufficient or poor quality data can result in a less effective model",
+              "points": 1
+            }
+          ],
+          "hints": [
+            "Refer to the explanation around 01:54.",
+            "Consider how data affects predictions.",
+            "Mention that data quality influences the overall performance of the model."
+          ],
+          "explanation": ""
+        },
+        {
+          "type": "short_question",
+          "question_nature": "remember",
+          "required": false,
+          "question": "Name one of the devices mentioned that is used to measure a feature of drinks.",
+          "point_value": 3,
+          "reference_text": [
+            {
+              "text": "a spectrometer for measuring the color and a hydrometer to measure the alcohol content",
+              "timestamp": "01:18-01:54"
+            }
+          ],
+          "answer": [
+            {
+              "criteria": "Mentions either 'spectrometer' or 'hydrometer'",
+              "points": 3
+            }
+          ],
+          "hints": [
+            "Look at the details given in the data collection section.",
+            "You can choose either the device for color or for alcohol content.",
+            "One option is the spectrometer if referring to color measurement."
+          ],
+          "explanation": ""
+        },
+        {
+          "type": "open-ended",
+          "question_nature": "understand",
+          "required": false,
+          "question": "Explain why the video selects 'color' and 'alcohol content' as features for distinguishing wine from beer.",
+          "point_value": 4,
+          "reference_text": [
+            {
+              "text": "the hope is that we can split our two types of drinks along these two factors alone",
+              "timestamp": "01:18-01:54"
+            }
+          ],
+          "answer": [
+            {
+              "criteria": "Explains that these features are likely to differ between wine and beer",
+              "points": 2
+            },
+            {
+              "criteria": "Mentions that selecting meaningful features helps in effectively distinguishing between the two",
+              "points": 2
+            }
+          ],
+          "hints": [
+            "Review the rationale given between 01:18 and 01:54.",
+            "Focus on how the features might uniquely characterize wine and beer.",
+            "Explain that these attributes help in separating the data into distinct categories."
+          ],
+          "explanation": ""
+        },
+        {
+          "type": "open-ended",
+          "question_nature": "apply",
+          "required": false,
+          "question": "Imagine you need to differentiate between two types of coffee. How would you apply the concept of data collection in this scenario?",
+          "point_value": 4,
+          "reference_text": [
+            {
+              "text": "collect data from glasses of wine and beer by measuring features",
+              "timestamp": "01:18-01:54"
+            }
+          ],
+          "answer": [
+            {
+              "criteria": "Describes selecting relevant features for coffee (e.g., roast level, aroma intensity)",
+              "points": 2
+            },
+            {
+              "criteria": "Explains the process of measuring and collecting data similarly to the video example",
+              "points": 2
+            }
+          ],
+          "hints": [
+            "Think about what characteristics differentiate types of coffee.",
+            "Apply the same methodology used for drinks in the video.",
+            "Discuss collecting measurable attributes and ensuring sufficient data quality."
+          ],
+          "explanation": ""
+        },
+        {
+          "type": "open-ended",
+          "question_nature": "analyze",
+          "required": false,
+          "question": "Analyze the impact of imbalanced data (e.g., more samples of one class) on a model's predictions.",
+          "point_value": 4,
+          "reference_text": [
+            {
+              "text": "if we collected way more data points about beer than wine the model we train will be heavily biased toward guessing that virtually everything it sees is beer",
+              "timestamp": "02:35-03:08"
+            }
+          ],
+          "answer": [
+            {
+              "criteria": "Identifies that imbalanced data can lead to biased predictions",
+              "points": 2
+            },
+            {
+              "criteria": "Provides an explanation on how bias in predictions may affect the model's accuracy",
+              "points": 2
+            }
+          ],
+          "hints": [
+            "Review the discussion on data imbalance between 02:35 and 03:08.",
+            "Consider how an overrepresentation of one class might skew predictions.",
+            "Explain that the model might become biased and reduce its prediction reliability on the underrepresented class."
+          ],
+          "explanation": ""
+        },
+        {
+          "type": "open-ended",
+          "question_nature": "evaluate",
+          "required": false,
+          "question": "Evaluate the potential risks of using low-quality data in training a machine learning model.",
+          "point_value": 4,
+          "reference_text": [
+            {
+              "text": "the quality and quantity of data ... will directly determine how good your predictive model can be",
+              "timestamp": "01:54"
+            }
+          ],
+          "answer": [
+            {
+              "criteria": "Mentions risks such as decreased accuracy and unreliable predictions",
+              "points": 2
+            },
+            {
+              "criteria": "Discusses potential issues like biased models or overfitting",
+              "points": 2
+            }
+          ],
+          "hints": [
+            "Focus on why data quality is critical as mentioned around 01:54.",
+            "Think about how poor data leads to errors in predictions.",
+            "Consider risks such as model bias and the propagation of errors from the training phase."
+          ],
+          "explanation": ""
+        },
+        {
+          "type": "open-ended",
+          "question_nature": "create",
+          "required": false,
+          "question": "Design a simple data collection plan to differentiate between two similar products of your choice.",
+          "point_value": 4,
+          "reference_text": [
+            {
+              "text": "collect data by measuring specific features",
+              "timestamp": "01:18-01:54"
+            }
+          ],
+          "answer": [
+            {
+              "criteria": "Proposes a clear plan with selected measurable features",
+              "points": 2
+            },
+            {
+              "criteria": "Explains how the data would be collected and verified for quality",
+              "points": 2
+            }
+          ],
+          "hints": [
+            "Consider products with distinctive characteristics (e.g., smartphones based on battery life and screen size).",
+            "Outline the steps of which features to measure and how to gather reliable data.",
+            "Ensure your plan addresses both feature selection and quality control."
+          ],
+          "explanation": ""
+        },
+        {
+          "type": "open-ended",
+          "question_nature": "integration",
+          "required": false,
+          "question": "How do data collection and data preparation work together to ensure effective model training?",
+          "point_value": 4,
+          "reference_text": [
+            {
+              "text": "gathering that data ... then randomize the ordering and prepare it for use in our machine learning training",
+              "timestamp": "01:18-03:08"
+            }
+          ],
+          "answer": [
+            {
+              "criteria": "Explains that quality data collection lays the foundation and data preparation refines it for training",
+              "points": 2
+            },
+            {
+              "criteria": "Mentions the importance of both stages to avoid biases and ensure reliability",
+              "points": 2
+            }
+          ],
+          "hints": [
+            "Reflect on the sequence from data collection to preparation discussed in the video.",
+            "Consider how cleaning and organizing data improves the training process.",
+            "Explain that without proper preparation, even high quality data might lead to poor model performance."
+          ],
+          "explanation": ""
         },
         {
           "type": "mcq",
+          "question_nature": "remember",
           "required": false,
-          "question": "Which of the following was NOT mentioned as a possible feature to collect?",
-          "point_value": 1,
+          "question": "Which device is used to measure the color of drinks?",
+          "point_value": 2,
           "options": [
-            "Foam amount",
-            "Color",
-            "Alcohol content",
-            "Sugar content"
+            "Hydrometer",
+            "Thermometer",
+            "Spectrometer",
+            "Barometer"
           ],
-          "correct_answer": "Sugar content",
-          "explanation": "Foam amount, color, and alcohol content are mentioned; sugar content is not.",
+          "correct_answer": "Spectrometer",
+          "reference_text": [
+            {
+              "text": "a spectrometer for measuring the color",
+              "timestamp": "01:18-01:54"
+            }
+          ],
+          "answer": [
+            {
+              "criteria": "Chooses 'Spectrometer' as the correct device",
+              "points": 2
+            }
+          ],
           "hints": [
-            "Recall the features listed before narrowing down to two.",
-            "Which feature is not in the transcript?",
-            "It's not about sweetness."
+            "Revisit the segment around 01:18 to 01:54.",
+            "Focus on the device mentioned specifically for color measurement.",
+            "Remember that a spectrometer is used to measure light wavelengths."
           ],
-          "reference_timestamp": "00:39-01:18"
+          "explanation": "The video states that a spectrometer is used for measuring the color as a wavelength of light."
         },
         {
-          "type": "short",
+          "type": "mcq",
+          "question_nature": "remember",
           "required": false,
-          "question": "How does the choice of features affect the ability to separate wine and beer?",
+          "question": "What feature is measured using a hydrometer?",
           "point_value": 2,
-          "sample_answer": "Choosing features that differ between wine and beer helps the model distinguish between them more easily.",
-          "explanation": "Relevant features make it easier for the model to form decision boundaries.",
-          "hints": [
-            "Features must be informative.",
-            "Think about differences in drinks.",
-            "More relevant features = better separation."
+          "options": [
+            "Color wavelength",
+            "Alcohol content",
+            "Temperature",
+            "pH level"
           ],
-          "reference_timestamp": "00:39-01:18"
+          "correct_answer": "Alcohol content",
+          "reference_text": [
+            {
+              "text": "a hydrometer to measure the alcohol content",
+              "timestamp": "01:18-01:54"
+            }
+          ],
+          "answer": [
+            {
+              "criteria": "Selects 'Alcohol content' as the correct answer",
+              "points": 2
+            }
+          ],
+          "hints": [
+            "Check the details mentioned regarding measuring alcohol content.",
+            "Focus on which instrument is paired with alcohol content.",
+            "Remember that the hydrometer is used for determining the alcohol percentage."
+          ],
+          "explanation": "The video explains that a hydrometer is used to measure the alcohol content of the drink."
         }
       ]
     },
     {
-      "title": "Preparing Data for Training",
+      "title": "Data Preparation",
       "required": true,
       "start_timestamp": "01:54",
       "end_timestamp": "03:43",
-      "summary": "This topic explains how to prepare collected data for machine learning, including organizing, randomizing, visualizing, and splitting data. It also discusses the importance of balanced datasets and mentions additional preparation steps like deduplication and normalization.",
+      "summary": "In this segment, the video explains how to prepare the data after collection. This includes combining all the measurements, randomizing the data order, visualizing the data to identify potential relationships or imbalances, and splitting the data into training and evaluation sets. Although techniques like deduplication and normalization exist, they are not needed in the simple example presented.",
       "questions": [
         {
-          "type": "discussion",
+          "type": "open-ended",
+          "question_nature": "personal_experience",
           "required": true,
-          "question": "Why is it important to randomize the order of your data before training?",
+          "question": "Have you ever had to organize or clean a large set of data? What challenges did you encounter and how did you overcome them?",
           "point_value": 2,
-          "evaluation_criteria": "Student explains that randomization prevents learning from data order, ensuring the model learns true patterns instead of sequence artifacts.",
-          "reference_timestamp": "02:35"
-        },
-        {
-          "type": "mcq",
-          "required": true,
-          "question": "What could happen if the dataset has many more beer samples than wine samples?",
-          "point_value": 1,
-          "options": [
-            "The model will be unbiased",
-            "The model will guess beer most of the time",
-            "The model will guess wine most of the time",
-            "The model will ignore the data"
+          "reference_text": [
+            {
+              "text": "data preparation where we load our data into a suitable place and prepare it for use",
+              "timestamp": "01:54-03:43"
+            }
           ],
-          "correct_answer": "The model will guess beer most of the time",
-          "explanation": "An imbalanced dataset biases the model towards the majority class.",
+          "answer": [
+            {
+              "criteria": "Describes a personal experience or project with data organization",
+              "points": 1
+            },
+            {
+              "criteria": "Mentions specific challenges such as inconsistencies, missing data, or lack of structure",
+              "points": 1
+            }
+          ],
           "hints": [
-            "Think about what happens with more samples of one class.",
-            "The model learns from frequency.",
-            "Bias comes from imbalance."
+            "Reflect on any project where you had to manage raw data.",
+            "Think of challenges like duplicate entries or misformatted data.",
+            "Explain your strategies for cleaning and organizing the data."
           ],
-          "reference_timestamp": "03:08"
+          "explanation": ""
         },
         {
-          "type": "short",
+          "type": "short_question",
+          "question_nature": "basic",
           "required": true,
-          "question": "Why do we split our data into training and evaluation sets?",
-          "point_value": 2,
-          "sample_answer": "To test the model's performance on data it hasn't seen before, ensuring it generalizes well.",
-          "explanation": "Splitting the data helps prevent overfitting and gives an unbiased measure of model performance.",
-          "hints": [
-            "Think about testing on new data.",
-            "It's about avoiding memorization.",
-            "Evaluation checks generalization."
-          ],
-          "reference_timestamp": "03:08"
-        },
-        {
-          "type": "reflective",
-          "required": true,
-          "question": "What problems might arise if we skip data cleaning steps like deduplication or normalization?",
+          "question": "What are the main steps involved in data preparation as described in the video?",
           "point_value": 3,
-          "sample_answer": "Skipping these steps can introduce errors or biases, leading to inaccurate or unfair models.",
-          "explanation": "Dirty data can mislead the model, causing poor performance or faulty predictions.",
-          "hints": [
-            "Think about duplicate or inconsistent data.",
-            "How would errors affect learning?",
-            "Clean data leads to better models."
+          "reference_text": [
+            {
+              "text": "we'll first put all our data together then randomize the ordering and do any pertinent visualizations ... and split the data into training and evaluation sets",
+              "timestamp": "01:54-03:43"
+            }
           ],
-          "reference_timestamp": "03:43"
+          "answer": [
+            {
+              "criteria": "Mentions combining data, randomizing order, visualizing, and splitting into training and evaluation sets",
+              "points": 3
+            }
+          ],
+          "hints": [
+            "Look at the steps mentioned between 01:54 and 03:43.",
+            "List the processes like combining, randomizing, visualizing, and splitting.",
+            "Make sure to include the splitting of data as one of the steps."
+          ],
+          "explanation": ""
+        },
+        {
+          "type": "short_question",
+          "question_nature": "basic",
+          "required": false,
+          "question": "Why is it important to split data into training and evaluation sets?",
+          "point_value": 3,
+          "reference_text": [
+            {
+              "text": "we also need to split the data into two parts ... one part used in training our model, the second part will be used for evaluating our trained model's performance",
+              "timestamp": "03:08-03:43"
+            }
+          ],
+          "answer": [
+            {
+              "criteria": "Explains that splitting prevents the model from simply memorizing data",
+              "points": 2
+            },
+            {
+              "criteria": "Mentions that it allows the model's performance to be fairly evaluated on unseen examples",
+              "points": 1
+            }
+          ],
+          "hints": [
+            "Re-read the section about splitting data.",
+            "Focus on the need for unbiased evaluation.",
+            "Mention that it prevents overfitting by testing on new data."
+          ],
+          "explanation": ""
+        },
+        {
+          "type": "short_question",
+          "question_nature": "remember",
+          "required": false,
+          "question": "Recall one method mentioned to avoid order bias in the data preparation process.",
+          "point_value": 3,
+          "reference_text": [
+            {
+              "text": "randomize the ordering of the data ... we wouldn't want the order of our data to affect how we learn",
+              "timestamp": "01:54-02:35"
+            }
+          ],
+          "answer": [
+            {
+              "criteria": "Mentions 'randomizing the order' of data",
+              "points": 3
+            }
+          ],
+          "hints": [
+            "Focus on how the sequence of data is altered.",
+            "Look for the term that indicates mixing the data.",
+            "Recall that the video specifically uses randomization to avoid bias."
+          ],
+          "explanation": ""
+        },
+        {
+          "type": "open-ended",
+          "question_nature": "understand",
+          "required": false,
+          "question": "Explain why visualizing data is a useful step during data preparation.",
+          "point_value": 4,
+          "reference_text": [
+            {
+              "text": "a good time to do any pertinent visualizations of your data helping you see if there's any relevant relationships between different variables as well as show you if there are any data imbalances",
+              "timestamp": "02:35-03:08"
+            }
+          ],
+          "answer": [
+            {
+              "criteria": "Explains that visualization helps in identifying relationships and imbalances",
+              "points": 2
+            },
+            {
+              "criteria": "Mentions that it aids in understanding the distribution and quality of data",
+              "points": 2
+            }
+          ],
+          "hints": [
+            "Review the part about data visualization between 02:35 and 03:08.",
+            "Focus on the ideas of relationships and imbalances in the data.",
+            "Explain how visualization informs the next steps in processing the data."
+          ],
+          "explanation": ""
+        },
+        {
+          "type": "open-ended",
+          "question_nature": "apply",
+          "required": false,
+          "question": "How would you apply the concept of randomizing data in a new dataset to ensure unbiased training?",
+          "point_value": 4,
+          "reference_text": [
+            {
+              "text": "randomize the ordering of the data",
+              "timestamp": "01:54-02:35"
+            }
+          ],
+          "answer": [
+            {
+              "criteria": "Describes a process of shuffling or randomly ordering the data entries",
+              "points": 2
+            },
+            {
+              "criteria": "Mentions that this helps in avoiding any sequence effects or bias in the training data",
+              "points": 2
+            }
+          ],
+          "hints": [
+            "Think of how shuffling a deck of cards prevents order bias.",
+            "Relate the process to ensuring each data point is independent.",
+            "Explain that randomization ensures that training does not end up biased by the order of data."
+          ],
+          "explanation": ""
+        },
+        {
+          "type": "open-ended",
+          "question_nature": "analyze",
+          "required": false,
+          "question": "Analyze the potential consequences of not randomizing your data before training a machine learning model.",
+          "point_value": 4,
+          "reference_text": [
+            {
+              "text": "we wouldn't want the order of our data to affect how we learn",
+              "timestamp": "01:54-02:35"
+            }
+          ],
+          "answer": [
+            {
+              "criteria": "Explains that not randomizing may lead to sequence bias",
+              "points": 2
+            },
+            {
+              "criteria": "Mentions that the model might overfit or learn patterns that do not generalize",
+              "points": 2
+            }
+          ],
+          "hints": [
+            "Reflect on the importance of randomness mentioned in the segment.",
+            "Consider how biases might be introduced when data follows a particular order.",
+            "Explain that without randomization, the model might learn non-representative patterns."
+          ],
+          "explanation": ""
+        },
+        {
+          "type": "open-ended",
+          "question_nature": "evaluate",
+          "required": false,
+          "question": "Assess the importance of data normalization in more complex datasets, even though it wasn't necessary in this example.",
+          "point_value": 4,
+          "reference_text": [
+            {
+              "text": "other forms of adjusting and manipulation things like ... normalization, but for this simple example, those are not needed",
+              "timestamp": "03:08-03:43"
+            }
+          ],
+          "answer": [
+            {
+              "criteria": "Discusses how normalization can help in scaling features for better model performance",
+              "points": 2
+            },
+            {
+              "criteria": "Mentions that in more complex datasets, normalization reduces biases due to feature scale differences",
+              "points": 2
+            }
+          ],
+          "hints": [
+            "Consider why normalization is more important when features vary widely.",
+            "Think about how normalization helps to compare different features on the same scale.",
+            "Explain that while it wasn’t needed for simple data, it’s crucial for complex, multi-feature datasets."
+          ],
+          "explanation": ""
+        },
+        {
+          "type": "open-ended",
+          "question_nature": "create",
+          "required": false,
+          "question": "Devise a strategy for preparing a dataset that may contain duplicates and inconsistent formatting.",
+          "point_value": 4,
+          "reference_text": [
+            {
+              "text": "sometimes the data we collect needs other forms of adjusting like deduplication",
+              "timestamp": "03:08-03:43"
+            }
+          ],
+          "answer": [
+            {
+              "criteria": "Proposes clear steps such as identifying duplicates, standardizing formats, and cleaning the data",
+              "points": 2
+            },
+            {
+              "criteria": "Explains how each step will help improve data quality for training",
+              "points": 2
+            }
+          ],
+          "hints": [
+            "Think about common issues when dealing with raw data.",
+            "Outline steps such as deduplication, format standardization, and error correction.",
+            "Make sure your strategy addresses each problem with a specific solution."
+          ],
+          "explanation": ""
+        },
+        {
+          "type": "open-ended",
+          "question_nature": "integration",
+          "required": false,
+          "question": "In what ways does the process of data preparation influence the subsequent stages of model training and evaluation?",
+          "point_value": 4,
+          "reference_text": [
+            {
+              "text": "prepare data for use in our machine learning training ... split the data into training and evaluation sets",
+              "timestamp": "01:54-03:43"
+            }
+          ],
+          "answer": [
+            {
+              "criteria": "Explains that clean and well-prepared data leads to more effective training by reducing noise",
+              "points": 2
+            },
+            {
+              "criteria": "Mentions that it allows for a fair evaluation since the data is unbiased and representative",
+              "points": 2
+            }
+          ],
+          "hints": [
+            "Reflect on how data is made ready for a machine learning model.",
+            "Think about how improper preparation can affect both training and evaluation negatively.",
+            "Explain that proper preparation ensures that the model is tested on reliable and unbiased data."
+          ],
+          "explanation": ""
         },
         {
           "type": "mcq",
+          "question_nature": "remember",
           "required": false,
-          "question": "Which of the following is NOT mentioned as a data preparation step in the video?",
-          "point_value": 1,
+          "question": "Which of the following is NOT part of the data preparation process described in the video?",
+          "point_value": 2,
           "options": [
-            "Randomization",
-            "Visualization",
-            "Deduplication",
-            "Data augmentation"
+            "Randomizing data order",
+            "Visualizing data",
+            "Data normalization for simple datasets",
+            "Splitting data into training and evaluation sets"
           ],
-          "correct_answer": "Data augmentation",
-          "explanation": "Data augmentation is not discussed; the others are covered.",
+          "correct_answer": "Data normalization for simple datasets",
+          "reference_text": [
+            {
+              "text": "deduplication and normalization, but for this simple example, those are not needed",
+              "timestamp": "03:08-03:43"
+            }
+          ],
+          "answer": [
+            {
+              "criteria": "Selects the option indicating normalization is not used in the simple example",
+              "points": 2
+            }
+          ],
           "hints": [
-            "Recall the steps listed.",
-            "One is common in image tasks but not mentioned.",
-            "Think about what wasn't needed in this example."
+            "Review the segment where additional preparation steps are mentioned.",
+            "Focus on what the video said about normalization for this specific example.",
+            "Remember that normalization was noted as unnecessary for the simple example given."
           ],
-          "reference_timestamp": "03:43"
+          "explanation": "The video explains that while normalization is a common data preparation step, it was deemed unnecessary in this simple example."
         },
         {
-          "type": "short",
+          "type": "mcq",
+          "question_nature": "remember",
           "required": false,
-          "question": "How can visualizing data help during the preparation step?",
+          "question": "What is the primary purpose of randomizing the data order during preparation?",
           "point_value": 2,
-          "sample_answer": "It helps identify relationships and imbalances in the data, guiding further preparation steps.",
-          "explanation": "Visualization provides insights that inform better data cleaning and feature selection.",
-          "hints": [
-            "Think about what you see in a plot.",
-            "Relationships and imbalances can be spotted visually.",
-            "Useful for planning next steps."
+          "options": [
+            "To speed up training",
+            "To avoid sequence bias",
+            "To reduce data size",
+            "To enhance model complexity"
           ],
-          "reference_timestamp": "02:35"
+          "correct_answer": "To avoid sequence bias",
+          "reference_text": [
+            {
+              "text": "we wouldn't want the order of our data to affect how we learn",
+              "timestamp": "01:54-02:35"
+            }
+          ],
+          "answer": [
+            {
+              "criteria": "Identifies that randomization is used to prevent sequence bias",
+              "points": 2
+            }
+          ],
+          "hints": [
+            "Look at the reason provided in the video for randomizing data.",
+            "Consider the impact of data order on training outcomes.",
+            "Remember that randomization ensures that learning is independent of data sequencing."
+          ],
+          "explanation": "Randomizing the data order is done to ensure that the model does not learn based on the sequence of data, which could lead to bias."
         }
       ]
     },
     {
-      "title": "Model Selection and Training",
-      "required": false,
+      "title": "Model Choice & Training",
+      "required": true,
       "start_timestamp": "03:43",
       "end_timestamp": "06:24",
-      "summary": "This topic covers how to choose a model suitable for the data and features, focusing on using a linear model for the drink classification task. It explains the training process, including adjusting weights and biases through repeated iterations to improve accuracy.",
+      "summary": "This segment discusses how a model is chosen and trained. A simple linear model is selected for classifying wine versus beer because only two features (color and alcohol percentage) are used. The training process involves initializing random parameters (m and b), making predictions, comparing them to actual outputs, and adjusting these parameters iteratively until the model becomes effective.",
       "questions": [
         {
-          "type": "discussion",
+          "type": "open-ended",
+          "question_nature": "personal_experience",
           "required": true,
-          "question": "Why might a simple linear model be chosen for this wine vs. beer example?",
+          "question": "Have you ever had to learn a new skill through practice and iteration? How did you approach mastering it?",
           "point_value": 2,
-          "evaluation_criteria": "Student explains that a linear model is suitable because there are only two features and the problem is relatively simple.",
-          "reference_timestamp": "04:25"
-        },
-        {
-          "type": "mcq",
-          "required": true,
-          "question": "In training a model, what are 'weights' and 'biases' used for?",
-          "point_value": 1,
-          "options": [
-            "They are the input data",
-            "They store the correct answers",
-            "They adjust the model's predictions",
-            "They measure data quality"
+          "reference_text": [
+            {
+              "text": "the training process is similar to how someone learns to drive and improves over time",
+              "timestamp": "04:25-05:04"
+            }
           ],
-          "correct_answer": "They adjust the model's predictions",
-          "explanation": "Weights and biases are parameters that are tuned to improve model output.",
+          "answer": [
+            {
+              "criteria": "Shares a personal experience related to learning through practice",
+              "points": 1
+            },
+            {
+              "criteria": "Mentions the iterative nature of skill improvement",
+              "points": 1
+            }
+          ],
           "hints": [
-            "They change as training progresses.",
-            "They are part of the model.",
-            "Think about what makes predictions better."
+            "Consider any personal experience of learning by doing.",
+            "Reflect on activities that required repeated practice.",
+            "Explain how iterative learning helped you master the skill."
           ],
-          "reference_timestamp": "05:04-05:48"
+          "explanation": ""
         },
         {
-          "type": "short",
+          "type": "short_question",
+          "question_nature": "basic",
           "required": true,
-          "question": "What is the purpose of repeating training steps during model training?",
-          "point_value": 2,
-          "sample_answer": "Repeating training steps helps the model gradually improve its predictions by adjusting weights and biases based on errors.",
-          "explanation": "Each step allows the model to learn from mistakes and get closer to the ideal solution.",
-          "hints": [
-            "Think about learning from mistakes.",
-            "Improvement happens iteratively.",
-            "Each step adjusts parameters."
-          ],
-          "reference_timestamp": "06:24"
-        },
-        {
-          "type": "reflective",
-          "required": true,
-          "question": "How does the training of a machine learning model compare to learning a new skill, like driving?",
+          "question": "What type of model is chosen in the video for the classification task?",
           "point_value": 3,
-          "sample_answer": "Both involve starting with little knowledge, making mistakes, and improving through practice and feedback.",
-          "explanation": "Just as people learn from experience, models learn from data and error correction.",
-          "hints": [
-            "Think about practice and feedback.",
-            "Mistakes lead to improvement.",
-            "Both processes are gradual."
+          "reference_text": [
+            {
+              "text": "we can use a small linear model which is a fairly simple one that'll get the job done",
+              "timestamp": "03:43-04:25"
+            }
           ],
-          "reference_timestamp": "04:25-05:04"
+          "answer": [
+            {
+              "criteria": "States that a 'linear model' is chosen",
+              "points": 3
+            }
+          ],
+          "hints": [
+            "Review the explanation around 03:43-04:25.",
+            "Focus on the description of the chosen model.",
+            "Remember that the video mentions it as a simple linear model."
+          ],
+          "explanation": ""
+        },
+        {
+          "type": "short_question",
+          "question_nature": "basic",
+          "required": false,
+          "question": "What does the training of a model involve according to the video?",
+          "point_value": 3,
+          "reference_text": [
+            {
+              "text": "training involves initializing some random values for w and b, attempting to predict outputs and then adjusting the values to improve predictions",
+              "timestamp": "04:25-05:04"
+            }
+          ],
+          "answer": [
+            {
+              "criteria": "Mentions that training involves initializing parameters, predicting outputs, and adjusting them",
+              "points": 3
+            }
+          ],
+          "hints": [
+            "Look at the segment where the training process is described.",
+            "Focus on the iterative adjustments made to the model parameters.",
+            "Include details about comparing predictions to actual outputs."
+          ],
+          "explanation": ""
+        },
+        {
+          "type": "short_question",
+          "question_nature": "remember",
+          "required": false,
+          "question": "Recall what the parameter 'm' represents in the linear equation y = mx + b.",
+          "point_value": 3,
+          "reference_text": [
+            {
+              "text": "the formula for a straight line is y equals mx plus b where m is the slope",
+              "timestamp": "05:04-05:48"
+            }
+          ],
+          "answer": [
+            {
+              "criteria": "States that 'm' represents the slope of the line",
+              "points": 3
+            }
+          ],
+          "hints": [
+            "Refer to the mathematical explanation given around 05:04-05:48.",
+            "Focus on the components of the linear equation.",
+            "Remember that m is described as the slope."
+          ],
+          "explanation": ""
+        },
+        {
+          "type": "open-ended",
+          "question_nature": "understand",
+          "required": false,
+          "question": "Explain in your own words why a linear model is suitable for the given data features.",
+          "point_value": 4,
+          "reference_text": [
+            {
+              "text": "in our case we have just two features... we can use a small linear model",
+              "timestamp": "03:43-04:25"
+            }
+          ],
+          "answer": [
+            {
+              "criteria": "Mentions that the simplicity of the data (two features) fits well with a linear model",
+              "points": 2
+            },
+            {
+              "criteria": "Explains that a linear model efficiently distinguishes between two classes using a simple boundary",
+              "points": 2
+            }
+          ],
+          "hints": [
+            "Focus on why simplicity in features suggests a linear decision boundary.",
+            "Re-read the parts discussing the model selection.",
+            "Explain that a linear model is both simple and effective for two-dimensional data."
+          ],
+          "explanation": ""
+        },
+        {
+          "type": "open-ended",
+          "question_nature": "apply",
+          "required": false,
+          "question": "How could you apply the concept of model training to a different scenario, such as predicting housing prices?",
+          "point_value": 4,
+          "reference_text": [
+            {
+              "text": "training means adjusting the model's parameters to improve its predictions",
+              "timestamp": "04:25-05:48"
+            }
+          ],
+          "answer": [
+            {
+              "criteria": "Describes setting up a model with relevant features for housing prices",
+              "points": 2
+            },
+            {
+              "criteria": "Mentions using iterative training to adjust parameters to improve prediction accuracy",
+              "points": 2
+            }
+          ],
+          "hints": [
+            "Think of how training improved predictions in the drinks example.",
+            "Apply a similar iterative parameter adjustment process to housing data.",
+            "Include steps like defining features, initializing parameters, and updating them based on errors."
+          ],
+          "explanation": ""
+        },
+        {
+          "type": "open-ended",
+          "question_nature": "analyze",
+          "required": false,
+          "question": "Analyze the significance of the iterative process of updating model parameters during training.",
+          "point_value": 4,
+          "reference_text": [
+            {
+              "text": "the training process ... the line moves step by step closer to the ideal separation",
+              "timestamp": "05:04-06:24"
+            }
+          ],
+          "answer": [
+            {
+              "criteria": "Explains that iteratively updating parameters refines the model’s decision boundary",
+              "points": 2
+            },
+            {
+              "criteria": "Mentions that each iteration reduces error and improves model accuracy",
+              "points": 2
+            }
+          ],
+          "hints": [
+            "Review the iterative process described between 05:04 and 06:24.",
+            "Discuss how repeated adjustments help in narrowing down on the optimal parameters.",
+            "Emphasize that each training step improves the model's performance."
+          ],
+          "explanation": ""
+        },
+        {
+          "type": "open-ended",
+          "question_nature": "evaluate",
+          "required": false,
+          "question": "Evaluate the benefits and potential limitations of using a linear model for classification tasks.",
+          "point_value": 4,
+          "reference_text": [
+            {
+              "text": "a small linear model which is a fairly simple one that'll get the job done",
+              "timestamp": "03:43-04:25"
+            }
+          ],
+          "answer": [
+            {
+              "criteria": "Mentions that linear models are simple, fast, and interpretable",
+              "points": 2
+            },
+            {
+              "criteria": "Highlights limitations such as inability to capture complex patterns or non-linear relationships",
+              "points": 2
+            }
+          ],
+          "hints": [
+            "Think about the advantages of simplicity in a model.",
+            "Consider what situations might require more complex models.",
+            "Discuss both the strengths (speed, interpretability) and weaknesses (limited complexity) of linear models."
+          ],
+          "explanation": ""
+        },
+        {
+          "type": "open-ended",
+          "question_nature": "create",
+          "required": false,
+          "question": "Design a modified training approach that could potentially improve the linear model's predictions.",
+          "point_value": 4,
+          "reference_text": [
+            {
+              "text": "training involves updating parameters ... and adjusting them iteratively",
+              "timestamp": "04:25-06:24"
+            }
+          ],
+          "answer": [
+            {
+              "criteria": "Proposes additional strategies such as experimenting with different learning rates or adding regularization",
+              "points": 2
+            },
+            {
+              "criteria": "Explains how the modifications could refine parameter updates and reduce overfitting",
+              "points": 2
+            }
+          ],
+          "hints": [
+            "Consider aspects like hyperparameter tuning and regularization techniques.",
+            "Look into methods to potentially speed up convergence or improve accuracy.",
+            "Include detailed steps explaining how your new approach would differ from the standard training process."
+          ],
+          "explanation": ""
+        },
+        {
+          "type": "open-ended",
+          "question_nature": "integration",
+          "required": false,
+          "question": "How do the choices made in model selection and the subsequent training process interrelate within the overall machine learning workflow?",
+          "point_value": 4,
+          "reference_text": [
+            {
+              "text": "choosing a model depends on the features and type of data... training means adjusting the model's parameters",
+              "timestamp": "03:43-06:24"
+            }
+          ],
+          "answer": [
+            {
+              "criteria": "Describes how the selection of a model sets the stage for a particular training method",
+              "points": 2
+            },
+            {
+              "criteria": "Mentions that both model choice and training are crucial to achieving high prediction accuracy",
+              "points": 2
+            }
+          ],
+          "hints": [
+            "Think about how the model is chosen based on data characteristics.",
+            "Consider how training adapts the model to these characteristics.",
+            "Explain that the two steps are interdependent: the model sets constraints while training refines performance."
+          ],
+          "explanation": ""
         },
         {
           "type": "mcq",
+          "question_nature": "remember",
           "required": false,
-          "question": "What mathematical formula is used for the linear model in this example?",
-          "point_value": 1,
+          "question": "What does 'm' represent in the linear equation y = mx + b used in training?",
+          "point_value": 2,
           "options": [
-            "y = mx + b",
-            "a^2 + b^2 = c^2",
-            "E = mc^2",
-            "F = ma"
+            "The prediction output",
+            "The data input",
+            "The slope",
+            "The bias"
           ],
-          "correct_answer": "y = mx + b",
-          "explanation": "The video uses the formula for a straight line, y = mx + b.",
+          "correct_answer": "The slope",
+          "reference_text": [
+            {
+              "text": "the formula for a straight line is y equals mx plus b where m is that slope",
+              "timestamp": "05:04-05:48"
+            }
+          ],
+          "answer": [
+            {
+              "criteria": "Chooses 'The slope' as the correct interpretation of m",
+              "points": 2
+            }
+          ],
           "hints": [
-            "It's a line equation.",
-            "Common in algebra.",
-            "Relates input and output."
+            "Review the explanation of the linear equation provided.",
+            "Focus on the component that represents the rate of change.",
+            "Remember that m is explicitly described as the slope in the video."
           ],
-          "reference_timestamp": "05:04"
+          "explanation": "In the equation y = mx + b, m represents the slope, which determines how steep the line is."
         },
         {
-          "type": "short",
+          "type": "mcq",
+          "question_nature": "remember",
           "required": false,
-          "question": "What are the two main parameters adjusted during training the linear model?",
+          "question": "What is the main goal of training a model?",
           "point_value": 2,
-          "sample_answer": "The slope (m) and the y-intercept (b), also called weights and biases.",
-          "explanation": "These parameters define the decision boundary for the model.",
-          "hints": [
-            "Recall the line equation.",
-            "Both parameters shift the line.",
-            "They're tuned to fit the data."
+          "options": [
+            "To collect more data",
+            "To visualize data relationships",
+            "To adjust parameters for accurate predictions",
+            "To split data"
           ],
-          "reference_timestamp": "05:04-05:48"
+          "correct_answer": "To adjust parameters for accurate predictions",
+          "reference_text": [
+            {
+              "text": "training means ... adjusting the values in w and b such that we will have more accurate predictions",
+              "timestamp": "04:25-06:24"
+            }
+          ],
+          "answer": [
+            {
+              "criteria": "Selects the option that mentions adjusting parameters to improve prediction accuracy",
+              "points": 2
+            }
+          ],
+          "hints": [
+            "Revisit the discussion on training between 04:25 and 06:24.",
+            "Focus on how training improves prediction accuracy by adjusting parameters.",
+            "Remember that the purpose of training is to minimize errors in predictions."
+          ],
+          "explanation": "The primary goal of training is to adjust the model's parameters so that its predictions become as accurate as possible."
         }
       ]
     },
     {
-      "title": "Model Evaluation and Prediction",
-      "required": false,
+      "title": "Evaluation & Prediction",
+      "required": true,
       "start_timestamp": "06:24",
       "end_timestamp": "10:05",
-      "summary": "This topic explains how to evaluate a trained model using new data, the importance of tuning hyperparameters, and the final step of making predictions. It emphasizes testing with unseen data and iteratively improving the model for real-world use.",
+      "summary": "This segment describes the steps following model training, including evaluation and prediction. After training, the model is tested with a separate set of data to assess its performance. The process also involves tuning hyperparameters like learning rate and training steps. Once the model performs satisfactorily, it is used to make predictions—such as determining whether a new drink is wine or beer. These principles can be generalized to other machine learning tasks.",
       "questions": [
         {
-          "type": "discussion",
+          "type": "open-ended",
+          "question_nature": "personal_experience",
           "required": true,
-          "question": "Why is it necessary to test the model on data it has never seen before?",
+          "question": "What experiences have you had with testing or evaluating a system's performance, and how did those experiences influence your understanding of its reliability?",
           "point_value": 2,
-          "evaluation_criteria": "Student explains that testing on new data ensures the model can generalize and is not just memorizing the training data.",
-          "reference_timestamp": "07:01"
-        },
-        {
-          "type": "mcq",
-          "required": true,
-          "question": "Which of the following is a 'hyperparameter' that can be tuned during training?",
-          "point_value": 1,
-          "options": [
-            "Learning rate",
-            "Color of the drink",
-            "Alcohol percentage",
-            "Model output"
+          "reference_text": [
+            {
+              "text": "evaluation allows us to test our model against data that has never been used for training ... see how the model might perform against data that has not yet seen",
+              "timestamp": "06:24-07:01"
+            }
           ],
-          "correct_answer": "Learning rate",
-          "explanation": "Learning rate is a parameter that controls how much the model's weights change per training step.",
+          "answer": [
+            {
+              "criteria": "Shares a relevant personal experience with system testing or evaluation",
+              "points": 1
+            },
+            {
+              "criteria": "Reflects on how that experience impacted their view on system reliability",
+              "points": 1
+            }
+          ],
           "hints": [
-            "It's about how fast the model learns.",
-            "Not a feature of the drink.",
-            "Mentioned during parameter tuning."
+            "Reflect on any software or system you’ve evaluated.",
+            "Consider projects where performance testing was required.",
+            "Discuss how evaluation influenced your confidence in the system."
           ],
-          "reference_timestamp": "07:38"
+          "explanation": ""
         },
         {
-          "type": "short",
+          "type": "short_question",
+          "question_nature": "basic",
           "required": true,
-          "question": "What is the purpose of model evaluation?",
-          "point_value": 2,
-          "sample_answer": "Model evaluation checks how well the model performs on new, unseen data to ensure it will work in real-world situations.",
-          "explanation": "Evaluation provides an unbiased measure of model effectiveness.",
-          "hints": [
-            "Think about testing vs training.",
-            "Why check on different data?",
-            "Real-world readiness."
-          ],
-          "reference_timestamp": "07:01"
-        },
-        {
-          "type": "reflective",
-          "required": true,
-          "question": "How can tuning hyperparameters improve a machine learning model?",
+          "question": "What is the primary purpose of the evaluation step in the machine learning process?",
           "point_value": 3,
-          "sample_answer": "Tuning hyperparameters like learning rate or training steps can help the model learn more efficiently and achieve higher accuracy.",
-          "explanation": "Hyperparameter tuning is an experimental process that optimizes training for better results.",
-          "hints": [
-            "Think about settings that affect learning.",
-            "Not actual model weights.",
-            "Optimization process."
+          "reference_text": [
+            {
+              "text": "evaluation allows us to test our trained model's performance on data that has not been used for training",
+              "timestamp": "06:24-07:01"
+            }
           ],
-          "reference_timestamp": "07:38-08:51"
+          "answer": [
+            {
+              "criteria": "States that the purpose is to assess the model's performance on unseen data",
+              "points": 3
+            }
+          ],
+          "hints": [
+            "Review the discussion on evaluation starting at 06:24.",
+            "Focus on why the evaluation data is set apart from training data.",
+            "Mention that it helps validate the model’s effectiveness in real-world scenarios."
+          ],
+          "explanation": ""
+        },
+        {
+          "type": "short_question",
+          "question_nature": "basic",
+          "required": false,
+          "question": "Why is it important to use an evaluation dataset that was not part of the training data?",
+          "point_value": 3,
+          "reference_text": [
+            {
+              "text": "evaluation uses a set-aside data that the model never saw during training",
+              "timestamp": "06:24-07:01"
+            }
+          ],
+          "answer": [
+            {
+              "criteria": "Explains that it prevents the model from memorizing the data and gives a fair test of generalization",
+              "points": 3
+            }
+          ],
+          "hints": [
+            "Consider how using the same data for both training and testing may lead to overfitting.",
+            "Think about the benefits of evaluating on unseen data.",
+            "Explain that it ensures the model’s performance is generalizable."
+          ],
+          "explanation": ""
+        },
+        {
+          "type": "short_question",
+          "question_nature": "remember",
+          "required": false,
+          "question": "Name one hyperparameter mentioned in the evaluation process.",
+          "point_value": 3,
+          "reference_text": [
+            {
+              "text": "tuning parameters like learning rate and training steps ... these parameters are typically referred to as hyper parameters",
+              "timestamp": "07:01-07:38"
+            }
+          ],
+          "answer": [
+            {
+              "criteria": "Mentions 'learning rate' or 'training steps'",
+              "points": 3
+            }
+          ],
+          "hints": [
+            "Review the section discussing hyperparameters between 07:01 and 07:38.",
+            "Focus on the specific terms used (e.g., learning rate).",
+            "Select one of the parameters that influence training mentioned in the video."
+          ],
+          "explanation": ""
+        },
+        {
+          "type": "open-ended",
+          "question_nature": "understand",
+          "required": false,
+          "question": "Explain why tuning hyperparameters, such as the learning rate, can improve a model's performance.",
+          "point_value": 4,
+          "reference_text": [
+            {
+              "text": "tuning parameters like learning rate ... can lead to higher accuracies",
+              "timestamp": "07:01-07:38"
+            }
+          ],
+          "answer": [
+            {
+              "criteria": "Explains that tuning helps in finding the optimal balance between speed and accuracy",
+              "points": 2
+            },
+            {
+              "criteria": "Mentions that the proper hyperparameter settings prevent issues like overshooting the minimum error",
+              "points": 2
+            }
+          ],
+          "hints": [
+            "Review the details about hyperparameter tuning from 07:01 to 07:38.",
+            "Think about how adjusting learning rate affects the training trajectory.",
+            "Explain that proper settings can lead to better convergence and fewer errors."
+          ],
+          "explanation": ""
+        },
+        {
+          "type": "open-ended",
+          "question_nature": "apply",
+          "required": false,
+          "question": "How would you apply the evaluation process to a model designed for spam email detection?",
+          "point_value": 4,
+          "reference_text": [
+            {
+              "text": "evaluation allows us to test our trained model on unseen data",
+              "timestamp": "06:24-07:01"
+            }
+          ],
+          "answer": [
+            {
+              "criteria": "Describes setting aside a portion of email data not used during training",
+              "points": 2
+            },
+            {
+              "criteria": "Mentions using this data to assess the model's accuracy in correctly identifying spam",
+              "points": 2
+            }
+          ],
+          "hints": [
+            "Think about the same evaluation strategy applied to another domain.",
+            "Define how you would partition email data for training and testing.",
+            "Discuss measuring the model’s accuracy in detecting spam from unseen emails."
+          ],
+          "explanation": ""
+        },
+        {
+          "type": "open-ended",
+          "question_nature": "analyze",
+          "required": false,
+          "question": "Analyze the relationship between the evaluation step and real-world performance of a machine learning model.",
+          "point_value": 4,
+          "reference_text": [
+            {
+              "text": "evaluation ... is meant to be representative of how the model might perform in the real world",
+              "timestamp": "06:24-07:01"
+            }
+          ],
+          "answer": [
+            {
+              "criteria": "Explains that good evaluation metrics indicate likely success in real-world applications",
+              "points": 2
+            },
+            {
+              "criteria": "Mentions that evaluation helps identify if the model needs further tuning before deployment",
+              "points": 2
+            }
+          ],
+          "hints": [
+            "Focus on how evaluation predicts real-world functioning.",
+            "Discuss the implications of evaluation results on model deployment.",
+            "Explain that a model that performs well in evaluation is expected to generalize effectively outside the lab."
+          ],
+          "explanation": ""
+        },
+        {
+          "type": "open-ended",
+          "question_nature": "evaluate",
+          "required": false,
+          "question": "Evaluate the pros and cons of using a fixed evaluation split ratio, such as 80/20 or 70/30, for model evaluation.",
+          "point_value": 4,
+          "reference_text": [
+            {
+              "text": "a good rule of thumb i use for a training evaluation split is somewhere on the order of 80 20 or 70 30",
+              "timestamp": "07:01-07:38"
+            }
+          ],
+          "answer": [
+            {
+              "criteria": "Mentions that a fixed ratio simplifies the evaluation process and ensures a sufficient amount of training data",
+              "points": 2
+            },
+            {
+              "criteria": "Discusses potential downsides such as reduced evaluation robustness if the dataset is small",
+              "points": 2
+            }
+          ],
+          "hints": [
+            "Reflect on the explanation provided about evaluation splits.",
+            "Think about the balance between training and evaluation data quality.",
+            "Discuss how the fixed ratio might be beneficial or problematic depending on dataset size."
+          ],
+          "explanation": ""
+        },
+        {
+          "type": "open-ended",
+          "question_nature": "create",
+          "required": false,
+          "question": "Propose a method to improve model predictions based on the evaluation results from an experiment.",
+          "point_value": 4,
+          "reference_text": [
+            {
+              "text": "once you've done evaluation it's possible that you want to see if you can further improve your training in any way ... we can do this by tuning some of our parameters",
+              "timestamp": "07:38-08:16"
+            }
+          ],
+          "answer": [
+            {
+              "criteria": "Proposes a clear strategy such as adjusting hyperparameters or incorporating additional data",
+              "points": 2
+            },
+            {
+              "criteria": "Explains how the proposed changes would refine the model based on evaluation feedback",
+              "points": 2
+            }
+          ],
+          "hints": [
+            "Consider steps like hyperparameter tuning or data augmentation.",
+            "Relate your method to addressing issues identified during evaluation.",
+            "Include specific modifications that can be implemented to enhance prediction accuracy."
+          ],
+          "explanation": ""
+        },
+        {
+          "type": "open-ended",
+          "question_nature": "integration",
+          "required": false,
+          "question": "How do evaluation and prediction work together to validate and utilize a machine learning model in real-world applications?",
+          "point_value": 4,
+          "reference_text": [
+            {
+              "text": "once the model is performing well, it can be used to make predictions ... evaluation allows us to test our model ... indicative of how the model might perform in the real world",
+              "timestamp": "07:01-10:05"
+            }
+          ],
+          "answer": [
+            {
+              "criteria": "Explains that evaluation validates the model’s readiness for real-world tasks",
+              "points": 2
+            },
+            {
+              "criteria": "Mentions that once validated, the model is deployed for making predictions on new data",
+              "points": 2
+            }
+          ],
+          "hints": [
+            "Think about how models are first evaluated and then used in production.",
+            "Discuss the sequential relationship between confirming a model's performance and then applying it.",
+            "Explain that evaluation gives confidence in the model before it is used to predict in practical scenarios."
+          ],
+          "explanation": ""
         },
         {
           "type": "mcq",
+          "question_nature": "remember",
           "required": false,
-          "question": "What is the final step in a machine learning project as described in the video?",
-          "point_value": 1,
+          "question": "Which step comes immediately after training, according to the video?",
+          "point_value": 2,
           "options": [
-            "Data collection",
-            "Training",
-            "Prediction (inference)",
-            "Randomization"
+            "Data Collection",
+            "Data Preparation",
+            "Evaluation",
+            "Prediction"
           ],
-          "correct_answer": "Prediction (inference)",
-          "explanation": "Prediction is the step where the trained model is used to answer new questions.",
+          "correct_answer": "Evaluation",
+          "reference_text": [
+            {
+              "text": "once training is complete it's time to see if the model is any good using evaluation",
+              "timestamp": "06:24-07:01"
+            }
+          ],
+          "answer": [
+            {
+              "criteria": "Selects 'Evaluation' as the step following training",
+              "points": 2
+            }
+          ],
           "hints": [
-            "It's what you do after training and evaluation.",
-            "The model is now useful.",
-            "It's about using the model."
+            "Revisit the transition from training to the next stage in the video.",
+            "Focus on the step described after the model is trained.",
+            "Remember that evaluation is done to test the model's performance."
           ],
-          "reference_timestamp": "08:51-09:28"
+          "explanation": "After training, the model is evaluated on unseen data to assess its performance."
         },
         {
-          "type": "short",
+          "type": "mcq",
+          "question_nature": "remember",
           "required": false,
-          "question": "Why is hyperparameter tuning described as 'more of an art than a science'?",
+          "question": "What do hyperparameters influence in the training process?",
           "point_value": 2,
-          "sample_answer": "Because it often requires experimentation and intuition rather than following strict rules.",
-          "explanation": "Optimal hyperparameter values depend on the specific data and model, so trial and error is common.",
-          "hints": [
-            "Think about how you choose settings.",
-            "Is there a formula?",
-            "Experimentation is key."
+          "options": [
+            "The structure of the data",
+            "The speed and accuracy of training",
+            "The amount of data collected",
+            "The color measurement"
           ],
-          "reference_timestamp": "08:51"
+          "correct_answer": "The speed and accuracy of training",
+          "reference_text": [
+            {
+              "text": "another parameter is learning rate this defines how far we shift the line during each step based on the information from the previous training step",
+              "timestamp": "07:38-08:16"
+            }
+          ],
+          "answer": [
+            {
+              "criteria": "Selects the option that specifies the influence on training speed and accuracy",
+              "points": 2
+            }
+          ],
+          "hints": [
+            "Review the discussion around tuning the learning rate and its impact.",
+            "Focus on the relationship between hyperparameters and training efficiency.",
+            "Remember that hyperparameters affect both how quickly the model learns and how accurate it becomes."
+          ],
+          "explanation": "Hyperparameters, such as the learning rate, influence how quickly and accurately a model converges during training."
         }
       ]
     }

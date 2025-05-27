@@ -23,7 +23,7 @@ def show_question_bank(all_topics):
         selected_topic = st.selectbox("Filter by topic:", topic_titles)
     
     with filter_col2:
-        # Create a filter for question types
+        # Create a filter for question types - now using the new 'type' field
         question_types = ["All Types"] + sorted(list(set(q.get("type", "unknown") for q in all_questions)))
         selected_type = st.selectbox("Filter by question type:", question_types)
     
@@ -87,12 +87,22 @@ def show_question_bank(all_topics):
                     key=f"topic_{q_id}" 
                 )
                 
-                # Question type
+                # Question type - updated options to match new structure
                 q_type = st.selectbox(
                     "Question type", 
-                    ["mcq", "discussion", "short", "reflective"],
-                    index=["mcq", "discussion", "short", "reflective"].index(question.get("type", "discussion")),
+                    ["mcq", "open-ended", "short_question", "reflective"],
+                    index=["mcq", "open-ended", "short_question", "reflective"].index(question.get("type", "open-ended")) 
+                    if question.get("type") in ["mcq", "open-ended", "short_question", "reflective"] else 0,
                     key=f"q_type_{q_id}"
+                )
+
+                # Question nature - new field
+                q_nature = st.selectbox(
+                    "Question nature", 
+                    ["interest", "remember", "understand", "apply", "analyze", "evaluate", "create", "integration", "basic"],
+                    index=["interest", "remember", "understand", "apply", "analyze", "evaluate", "create", "integration", "basic"].index(question.get("question_nature", "basic"))
+                    if question.get("question_nature") in ["interest", "remember", "understand", "apply", "analyze", "evaluate", "create", "integration", "basic"] else 0,
+                    key=f"q_nature_{q_id}"
                 )
                 
             with cols[1]:
@@ -101,7 +111,7 @@ def show_question_bank(all_topics):
                     "Points", 
                     min_value=1, 
                     max_value=10, 
-                    value=question.get("point_value", 1),
+                    value=question.get("point_value", 5),
                     key=f"q_points_{q_id}"
                 )
                 
@@ -112,12 +122,33 @@ def show_question_bank(all_topics):
                     key=f"q_required_{q_id}"
                 )
                 
-                # Reference timestamp
+                # Reference timestamp is now in the reference_text structure
+                # Display a generic field for compatibility
                 q_timestamp = st.text_input(
                     "Reference timestamp", 
-                    question.get("reference_timestamp", ""),
+                    ", ".join([ref.get("timestamp", "") for ref in question.get("reference_text", [])]) 
+                    if isinstance(question.get("reference_text", []), list) else "",
                     key=f"q_timestamp_{q_id}"
                 )
+
+            # Reference text section - new structure handling
+            st.subheader("Reference Text")
+            if isinstance(question.get("reference_text", []), list):
+                for idx, ref in enumerate(question.get("reference_text", [])):
+                    col1, col2 = st.columns([4, 1])
+                    with col1:
+                        st.text_area(
+                            f"Reference {idx+1}", 
+                            ref.get("text", ""),
+                            height=68,
+                            key=f"ref_text_{q_id}_{idx}"
+                        )
+                    with col2:
+                        st.text_input(
+                            "Timestamp", 
+                            ref.get("timestamp", ""),
+                            key=f"ref_ts_{q_id}_{idx}"
+                        )
             
             # For MCQ questions, show options as individual fields
             if q_type == "mcq":
@@ -166,13 +197,44 @@ def show_question_bank(all_topics):
                     st.rerun()
                 
             else:
-                # For non-MCQ questions, show sample answer
-                sample_answer = st.text_area(
-                    "Sample answer", 
-                    question.get("sample_answer", ""),
-                    height=100,
-                    key=f"q_sample_{q_id}"
-                )
+                # For non-MCQ questions, show sample answer or answer structure based on type
+                if q_type == "short_question":
+                    # Short question uses direct answer
+                    sample_answer = st.text_area(
+                        "Sample answer", 
+                        question.get("answer", ""),
+                        height=100,
+                        key=f"q_sample_{q_id}"
+                    )
+                else:
+                    # Open ended uses criteria structure or could be rubric-based
+                    if isinstance(question.get("answer"), list):
+                        st.subheader("Answer Criteria")
+                        for idx, criterion in enumerate(question.get("answer", [])):
+                            col1, col2 = st.columns([4, 1])
+                            with col1:
+                                st.text_input(
+                                    f"Criterion {idx+1}",
+                                    criterion.get("criteria", ""),
+                                    key=f"criterion_{q_id}_{idx}"
+                                )
+                            with col2:
+                                st.number_input(
+                                    "Points",
+                                    min_value=0,
+                                    max_value=5,
+                                    value=criterion.get("points", 1),
+                                    key=f"criterion_pts_{q_id}_{idx}"
+                                )
+                    else:
+                        # Handle string answer for backward compatibility
+                        sample_answer = st.text_area(
+                            "Sample answer or rubric", 
+                            question.get("answer", ""),
+                            height=100,
+                            key=f"q_sample_{q_id}"
+                        )
+                
                 correct_answer = ""
                 new_options = []
             
@@ -230,6 +292,7 @@ def show_question_bank(all_topics):
                     "topic_title": question.get("topic_title"),
                     "question": q_text,
                     "type": q_type,
+                    "question_nature": q_nature,  # Add the new field
                     "point_value": q_points,
                     "required": q_required,
                     "reference_timestamp": q_timestamp,
@@ -242,7 +305,15 @@ def show_question_bank(all_topics):
                     st.session_state.edited_questions[q_id]["options"] = new_options
                     st.session_state.edited_questions[q_id]["correct_answer"] = correct_option
                 else:
-                    st.session_state.edited_questions[q_id]["sample_answer"] = sample_answer
+                    # Handle different answer formats based on question type
+                    if q_type == "short_question":
+                        st.session_state.edited_questions[q_id]["answer"] = sample_answer
+                    else:
+                        # For more complex answers, maintain the structure if it exists
+                        if isinstance(question.get("answer"), list):
+                            st.session_state.edited_questions[q_id]["answer"] = question.get("answer", [])
+                        else:
+                            st.session_state.edited_questions[q_id]["sample_answer"] = sample_answer
                 
                 st.success("Question updated successfully!")
         

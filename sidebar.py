@@ -121,7 +121,7 @@ def render_sidebar(all_topics, topic_timestamps, core_topics, youtube_url,extrac
         # Instead of using columns, display progress bar and text sequentially
 
         st.markdown(f"<h3 style='text-align: center; margin-top: 0px; margin-bottom: 10px;'>Topics completed: {st.session_state.completed_topics_count}/{core_topics_count} ({overall_progress:.1f}%)</h3>", unsafe_allow_html=True)
-        st.progress(overall_progress + 10 / 100)
+        st.progress(overall_progress + 5 / 100)
 
         # Topic Dashboard Panel (now collapsible with expander)
         with st.expander("Topics", expanded=True):

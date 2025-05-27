@@ -1,25 +1,33 @@
-Here are the features of the two mode of flipped learning app.
-1.  The chatbot will ask a set of questions related to the topic, which can be short questions, multiple-choice, or reflective question. For each question, 3 hints will be provided, along with a model answer and an explanation. The student must answer pre-defined minimum number of questions correctly to complete the topic. The instructors can define the type of questions that will be generated and the number of questions that the student should correctly answer to complete the topic. For multiple choice questions, the instructor can configure whether the chatbot should ask the student to explain their choice before providing feedback or moving to the next question.
+# instruction
+Learning outcome (provided by teacher):
+- Understand the basics of machine learning 
+- Understand the steps in machine learning, including data collection, preparation, model training, evaluation, and prediction
 
-For each topic, outuput the topic name, detailed topic summary, timestamp,
-Also generate the discussion items and various types of questions (3 mcq, 2 short questions, 2 reflective questions for each topic) based on the video transcript provided below.
-For discussion item, it short start from simple questions to more complex question.
-Each discussion item should provide and sample answer 
-For each question assign a point value (e.g., 1 point for mcq, 2 points for short questions, 3 points for reflective questions, 2 points for each discusson item). Each question or discuss item should output the question, point value, and sample answer, and the reference timestamp in the video transcript that contain the answer to the question. Each question should provide 3 hints, correct answer and explanation of the correct answer.
+For each of the 5 topics below, generate questions focusing on testing student understanding of the learning outcomes above.
+- 1 personal_experience question: connect the user with the topic such as preference, asking for opinion/preference, or past experience
+- 2 basic questions about the video content
+- 1 questions for each level of Bloom's taxonomy: 
+   - remember, understand, apply, analyze, evaluate, create (1 question each)
+- 1 integration question: a question that integrates concepts from various parts of the video
+- 2 MCQ questions on video content with 4 options each and only one correct answer
+
+For each question, provide:
+- question: the actual question text
+- required: whether the question is core question
+- type: mcq, short_question, open-ended. Short questions has a specific answer, while open-ended questions allow has no right or wrong answer (e.g. personal opinion or preference)
+- question_nature: e.g. remember, understand, apply, analyze, evaluate, create, personal_experience, integration, ...
+- reference_text: extract all relevant video segments related to the question with timestamps
+- answer (a list of criteria and point_value): the correct answer or rubrics for grading with citations to timestamps; include a list of criteria (which defines the expected responses of the student with the correct answer if available) with points assigned (max: 5 points per question)
+- point_value: the maximum points for the question
+- hints: 3 hints that progressively help without giving away the answer:
+  * first hint: reference to relevant video timestamps
+  * second hint: general guidance
+  * third hint: more specific guidance without revealing the answer
+- explanation: explanation for MCQs; empty string for other question types
 
 
-Requirements:
--  The first 3 topics has a field which indicates it's "Required = True", while the other required=false.
-- For each topic, generate 6 questions. The first 3 questions is core while the other are optional
-- For each topic, there will be core questions that user should complete.
-Core questions:
-- the first core question should be a discussion item (there is no answer but a rubric for evaluation), which means that it does not have right or wrong answer. E.g. ask which technology is most useful to student.
-question 2 will be mcq questions
-- question 4 will be reflective question on the topic.
-- Other questions should be optional questions.
-- Each topic name should be 4-5 words
-- 
-
+For each topic, outuput the topic name, detailed topic summary, timestamp. 
+For each topic, the first 2 questions  is the required questions, remaining are not required.
 
 # Output in Json Format without ```json
 
@@ -31,17 +39,34 @@ Example:
       "required": true, # indicates this topic is core topic
       "start_timestamp": "00:01",
       "end_timestamp": "00:39",
-      "summary": "..."
+      "summary": "(summary of topic)"
       "questions": [
         {
-          "type": "discussion",
+          "type": "open-ended",
+          "question_nature": "personal_experience",
           "required": true,
           "question": "What are some real-world applications of machine learning that you find most interesting?",
           "point_value": 2,
-          "evaluation_criteria": "Discuss the applications mentioned in the video and any additional ones you know.",
+          "reference_text": [
+              {
+                "text": "from detecting skin cancer to sorting cucumbers to detecting escalators in need of repair machine learning has granted computer systems entirely new abilities",
+                "timestamp": "00:01"
+              }
+            ],
+          "answer": 
+              [
+                  {"criteria": "Mentions at least one application of machine learning", "points": 1},
+                  {"criteria": "Provides a thoughtful explanation of why the application is interesting", "points": 1}
+              ]
+          "hints": [
+            "Refer to the video introduction around 00:01 for examples of machine learning applications.",
+            "Think about technologies that automatically recognize patterns or make predictions.",
+            "Consider devices or software that adapt or improve based on data."
+          ],
         }
         {
           "type": "mcq",
+          "question_nature": "remember
           "required": true
           "question": "Which of the following is NOT mentioned as an application of machine learning?",
           "point_value": 1,
@@ -52,33 +77,6 @@ Example:
             "..",
             ...
           ],
-          "reference_timestamp": "00:01"
-        },
-        {
-          "type": "short", # short question
-          "question": "Why is machine learning important in real-world applications?",
-          "point_value": 2,
-          "sample_answer": "Because it allows computer systems to perform tasks that are difficult to program manually by learning from data.",
-          "explanation": "Machine learning helps automate complex decision-making and pattern recognition tasks by using data instead of explicit rules.",
-          "hints": [
-            "Think about tasks that are hard to code.",
-            "Learning from data is key.",
-            "It enables automation."
-          ],
-          "reference_timestamp": "00:01-00:20"
-        }
-        {
-          "type": "reflective",
-          "question": "How might machine learning change traditional approaches to problem-solving in technology?",
-          "point_value": 3,
-          "sample_answer": "Machine learning shifts problem-solving from manual programming of rules to building models that learn patterns from data, enabling systems to adapt and handle complex tasks more efficiently.",
-          "explanation": "This reflects the paradigm shift from rule-based programming to data-driven learning enabling greater flexibility and automation.",
-          "hints": [
-            "Consider the difference between programming rules and learning.",
-            "Think about adaptability and automation.",
-            "Reflect on the complexity of tasks."
-          ],
-          "reference_timestamp": "00:20"
         }
       ]
     },
@@ -93,11 +91,7 @@ Example:
   "topics": [
     {
       "title": "Machine Learning Basics",
-      "learning_objectives": [
-        "Understand real-world uses of machine learning",
-        "Know what a model is and what training means",
-        "Recognize the idea of using features to answer questions"
-      ],
+
       "start_timestamp": "00:01",
       "end_timestamp": "00:39",
       "detailed_summary": "The video starts by explaining that machine learning gives computers new abilities, like detecting skin cancer or sorting cucumbers. The host introduces the main question: how does machine learning actually work? As an example, the video sets up a problem where a computer must decide if a drink is wine or beer. The system built to answer this question is called a 'model,' and creating it is called 'training'. The goal of training is to make a model that answers correctly most of the time."
@@ -115,33 +109,21 @@ Example:
     },
     {
       "title": "Data Preparation",
-      "learning_objectives": [
-        "Understand the need for data preparation before training",
-        "Know about data randomization, visualization, and splitting",
-        "Learn the importance of balanced data and cleaning"
-      ],
+
       "start_timestamp": "01:54",
       "end_timestamp": "03:43",
       "detailed_summary": "After collecting data, you must prepare it for training. This involves combining all measurements, randomizing their order, and visualizing the data to spot relationships or imbalances (like having more beer than wine samples). It's also important to split the data into training and evaluation sets, so the model is tested fairly. Other preparation steps can include deduplication and normalization, but for this simple example, those are not needed."
     },
     {
       "title": "Model Choice & Training",
-      "learning_objectives": [
-        "Know how to select an appropriate model",
-        "Understand how training works using data",
-        "Learn about weights, biases, and iterative improvement"
-      ],
+
       "start_timestamp": "03:43",
       "end_timestamp": "06:24",
       "detailed_summary": "Choosing a model depends on the features and type of data. Here, a simple linear model is used, which can separate wine and beer using a line. Training means adjusting the model's parameters (weights and biases) to improve its predictions, similar to how someone gets better at driving with practice. The process starts with random guesses and then iteratively updates the model so that predictions become more accurate over time."
     },
     {
       "title": "Evaluation & Prediction",
-      "learning_objectives": [
-        "Learn how to evaluate model performance",
-        "Understand hyperparameter tuning",
-        "Know the final steps to make predictions"
-      ],
+
       "start_timestamp": "06:24",
       "end_timestamp": "10:05",
       "detailed_summary": "After training, the model is evaluated using the set-aside data to see how well it works on new, unseen examples. The video discusses tuning parameters like learning rate and training steps (called hyperparameters) to further improve results. Once the model is performing well, it can be used to make predictions, like deciding if a new drink is wine or beer. The process described can be applied to other problems beyond drinks, showing the general steps of machine learning."
@@ -151,7 +133,7 @@ Example:
 
 # video contents
 The 7 steps of machine learning - YouTube
-https://www.youtube.com/watch?v=nKW8Ndu7Mjw
+
 
 Transcript:
 (00:01) from detecting skin cancer to sorting cucumbers to detecting escalators in need of repair machine learning has granted computer systems entirely new abilities but how does it really work under the hood let's walk through a basic example and use it as an excuse to talk about the process of getting answers from your data using machine learning welcome to cloud ai adventures my name is eufan guo on this show we'll explore the art science and tools of machine learning let's pretend that we've been asked to create a system that answers the question of whether a drink is wine or beer this question answering system that we
