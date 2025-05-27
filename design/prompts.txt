@@ -1,0 +1,27 @@
+1. Allow user to input url or upload a pdf file.
+
+2. Get the transcript or the text of pdf. for pdf doc, it will show the text in each page for user to confirm.
+
+3. Based on video contents, generate 16 questions to align with learning objective "understand machine learning basics". Each question should only have one question asked.
+1. personal: connect the user with the topic such as preference, opinion
+2. 3 basic questions about the video
+3. 1 question for each level of bloom taxaonomy: i.e. 
+   - remember, understand, apply, analyze, evaluate, create.
+4. integration: a question that integrates the concepts from various part of the video.
+5. 5 mcq questions on video with 4 options each with one correct answer.
+
+For each question, provide:
+- question
+- question type (remember, understand, apply, analyze, evaluate, interest)
+- reference text: extract the text of all the video sgements that is related to the question text or answer with citation of the timestamp.
+- answer: the correct answer to question or rubrics for grading with a citation to the corresponding timestamp in video. It is a list of criteria/answer with a point  assigned to it (max: 5 points for each question)
+- hints: a list of 3 hints without giving away the answer. The first hint should  refer  referring to all the video timestamps that is related to answering the question, the second hint should be a general hint, and the third hint should be a more specific hint but without giving the answer away
+- explanation: explanation for mcq. Empty string for other questions.
+
+User can select the questions they want to include in the question bank.
+4. Based on the selected questions, use AI to group the questions based on topics. User may select the max. number of topics to group the questions (max: 6)
+
+5. Preview the question bank in a table format with the following.
+The user can select the core questions that the user should answer in learning activity.
+
+6. Preview the chat based discussion UI with progress bar (similar to the original UI)

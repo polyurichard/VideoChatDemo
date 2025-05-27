@@ -202,7 +202,7 @@ def show_question_bank(all_topics):
                     hint_text = st.text_area(
                         f"Hint {idx+1}", 
                         hint,
-                        height=50,
+                        height=68,  # Increased from 50 to 68 to meet Streamlit's minimum height requirement
                         key=f"hint_{q_id}_{idx}"
                     )
                     new_hints.append(hint_text)

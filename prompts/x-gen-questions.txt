@@ -1,24 +1,98 @@
 Learning objective: understand machine learning.
 
-Based on video contents, generate questions. Each question should only have one question asked.
+Based on video contents, generate 16 questions to align with learning objective "understand machine learning basics". Each question should only have one question asked.
 1. personal: connect the user with the topic such as preference, opinion
-2. 3basic questions about the video
+2. 3 basic questions about the video
 3. 1 question for each level of bloom taxaonomy: i.e. 
    - remember, understand, apply, analyze, evaluate, create.
 4. integration: a question that integrates the concepts from various part of the video.
+5. 5 mcq questions on video with 4 options each with one correct answer.
+group above questions with at most 3 topic name (e.g. Overview of machine learning"
 
 For each question, provide:
-- question text
+- question
 - question type (remember, understand, apply, analyze, evaluate, interest)
-- reference text: provide all the video sgements that is related to the question text or answer with citation of the timestamp.
-- answer/rubrics: the correct answer to question or rubrics for grading with a citation to the corresponding timestamp in video. Each item should have a point assigned to it (max: 5 points for each question)
-- hints: a list of 3 hints without giving away the answer. The first hint should always be referring to the video timestamp containing the answer, the second hint should be a general hint, and the third hint should be a more specific hint.
+- reference text: extract the text of all the video sgements that is related to the question text or answer with citation of the timestamp.
+- answer: the correct answer to question or rubrics for grading with a citation to the corresponding timestamp in video. It is a list of criteria/answer with a point  assigned to it (max: 5 points for each question)
+- hints: a list of 3 hints without giving away the answer. The first hint should  refer  referring to all the video timestamps that is related to answering the question, the second hint should be a general hint, and the third hint should be a more specific hint but without giving the answer away
+- explanation: explanation for mcq. Empty string for other questions.
+- topic_name: the topic name that the question belongs to
 
+output in json format without ```json: Example:
+[  
+      {
+    "question": "Have you ever used or encountered any technology that you think uses machine learning? What was your experience with it?",
+    "question_type": "interest",
+    "reference_text": [
+        {
+          "text": "from detecting skin cancer to sorting cucumbers to detecting escalators in need of repair machine learning has granted computer systems entirely new abilities",
+          "timestamp": "00:01"
+        }
+      ],
+    "answer": 
+        [
+            {"criteria": "Open-ended; points awarded for relevance and personal reflection", "points": 5}
+        ]
+    "hints": [
+      "Refer to the video introduction around 00:01 for examples of machine learning applications.",
+      "Think about technologies that automatically recognize patterns or make predictions.",
+      "Consider devices or software that adapt or improve based on data."
+    ],
+    topic_name: "Overview of machine learning"
 
+  },
+    {
+    "question": "Why is it important to randomize and split the data before training the model?",
+    "question_type": "understand",
+    "reference_text": [
+        {"text": "randomize the ordering ... to make determination independent of sequence",
+          "timestamp": "02:35"
+        },
+        {
+          "text": "split data into training and evaluation to avoid memorization",
+          "timestamp": "03:08"
+        }
+    ]
+    "answer": [
+      {"criteria": "To prevent sequence bias in training", "points": 2},
+      {"criteria": "To evaluate the model on unseen data", "points": 3}
+    ],
+    "hints": [
+      "Refer to data preparation and splitting discussion around 02:35 to 03:43.",
+      "Randomizing ensures the model doesn't learn order instead of patterns.",
+      "Splitting helps test the model's ability to generalize."
+    ],
+    topic_name: ".."
+
+  },
+  {
+    "question": "Multiple Choice: Which of the following best describes a feature in machine learning?",
+    "question_type": "remember",
+    "reference_text": [
+      {"text": "features are aspects like color and alcohol percentage used for classification",
+        "timestamp": "01:18"
+      }
+    ],
+    "answer": "D",
+    "hints": [
+      "Look at the definition of features at 01:18.",
+      "Features are measurable inputs to the model.",
+      "Not the output or the model itself."
+    ],
+    "options": [
+      "A) The final prediction made by the model",
+      "B) The model parameters adjusted during training",
+      "C) The evaluation metric used",
+      "D) An individual measurable property used as input"
+    ],
+    "explanation": "...",
+    "topic_name": ...
+  }
+]
 
 # video contents
 The 7 steps of machine learning - YouTube
-https://www.youtube.com/watch?v=nKW8Ndu7Mjw
+
 
 Transcript:
 (00:01) from detecting skin cancer to sorting cucumbers to detecting escalators in need of repair machine learning has granted computer systems entirely new abilities but how does it really work under the hood let's walk through a basic example and use it as an excuse to talk about the process of getting answers from your data using machine learning welcome to cloud ai adventures my name is eufan guo on this show we'll explore the art science and tools of machine learning let's pretend that we've been asked to create a system that answers the question of whether a drink is wine or beer this question answering system that we
