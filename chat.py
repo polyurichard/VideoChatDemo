@@ -415,16 +415,16 @@ def main_chat_page():
         st.session_state.show_question_bank = False
 
     # Add navigation buttons at the top of the page in a row
-    top_col1, top_col2, top_col3, top_col4, top_col5 = st.columns([1, 1, 1, 2,1])
+    top_col1, top_col2, top_col3, top_col5 = st.columns([1, 1, 1, 1])
     
-    with top_col5:
-        if st.button("← Return to Home", key="return_home"):
+    with top_col3:
+        if st.button("← Home", key="return_home"):
             st.session_state.current_page = "welcome"
             st.rerun()
             
     with top_col2:
         # Add button to toggle Question Bank visibility
-        if st.button("📚 Question", key="toggle_question_bank"):
+        if st.button("📚 Question Bank", key="toggle_question_bank"):
             st.session_state.show_question_bank = True
             st.rerun()
             
