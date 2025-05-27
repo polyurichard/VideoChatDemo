@@ -8,7 +8,6 @@ class LLMService:
     def __init__(self, config_path=".env",
                 temperature = 0, streaming = False, json_mode = False, 
                 gpt_version = "gpt-4o-mini"):
-
         # Try to load the API key and endpoint from the configuration file
         try:
             config = toml.load(config_path)
@@ -28,8 +27,17 @@ class LLMService:
             try:
                 import streamlit as st
                 if hasattr(st, 'secrets') and "AZURE_OPENAI" in st.secrets:
-                    os.environ["AZURE_OPENAI_ENDPOINT"] = st.secrets["AZURE_OPENAI"]["AZURE_OPENAI_ENDPOINT"]
-                    os.environ["AZURE_OPENAI_API_KEY"] = st.secrets["AZURE_OPENAI"]["AZURE_OPENAI_API_KEY"]
+                    if gpt_version == "gpt-4o-mini":
+                        # Set the environment variables for the Azure OpenAI endpoint and API key
+                        openai_api_version="2024-12-01-preview"
+                        azure_deployment="gpt-4o-mini"
+                        os.environ["AZURE_OPENAI_ENDPOINT"] = config["AZURE_OPENAI"]["AZURE_OPENAI_ENDPOINT"]
+                        os.environ["AZURE_OPENAI_API_KEY"] = config["AZURE_OPENAI"]["AZURE_OPENAI_API_KEY"]
+                    elif gpt_version == "gpt-4.1-mini":
+                        openai_api_version="2024-12-01-preview"
+                        azure_deployment="gpt-4.1-mini"                
+                        os.environ["AZURE_OPENAI_ENDPOINT"] = config["AZURE_OPENAI"]["AZURE_OPENAI_ENDPOINT_41"]
+                        os.environ["AZURE_OPENAI_API_KEY"] = config["AZURE_OPENAI"]["AZURE_OPENAI_API_KEY_41"]
                 else:
                     raise ImportError("Streamlit secrets not configured with AZURE_OPENAI credentials")
             except ImportError as e:

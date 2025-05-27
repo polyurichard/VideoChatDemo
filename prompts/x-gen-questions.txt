@@ -1,28 +1,16 @@
 Based on video contents, generate 10 questions.
 1. 1 question for each level of bloom taxaonomy: i.e. 
    - remember, understand, apply, analyze, evaluate, create.
-2. 1 question for each of the following categories: 
-   - factual, conceptual, procedural, metacognitive.
-3. 1 question that tries to motivate the learner interest in the video.
+2. interest: 1 question that tries to motivate the learner interest in the video.
+
+For each question, provide:
+- question text
+- question type (remember, understand, apply, analyze, evaluate, interest)
+- reference text: a list of the text in the video that the question is based corresponding citation of timestamp.
+- answer/rubrics: the correct answer to question or rubrics for grading with a citation to the corresponding timestamp in video. Each item should have a point assigned to it (max: 5 points for each question)
+- hints: a list of hints
 
 
-list of topics that can be used to create a quiz or discussion questions. 
-For each topic, provide detailed summary of the video content related to that topic.
-explain in easy to understand manner the contents of the video with citation of the corresponding timestamp.
-
-There should be at most 5 topics and number of words in topic is at most 4 words.
-
-Output in JSON without ```json. Example:
-{
-  "topics": [
-    {
-      "title": "Introduction to Machine Learning and Problem Setup",
-      "start_timestamp": "00:01",
-      "end_timestamp": "00:39",
-      "detailed_summary": "Machine learning enables computers to perform tasks like detecting skin cancer or sorting cucumbers. The video introduces the concept of machine learning by setting up a problem where we need to classify drinks as wine or beer based on their color and alcohol content. The model we create through training aims to answer this question accurately most of the time."
-    },
-    ...
-}
 
 # video contents
 The 7 steps of machine learning - YouTube
