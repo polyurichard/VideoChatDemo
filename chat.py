@@ -44,7 +44,7 @@ def start_mcq_panel():
         
         # Switch to MCQ quiz page
         st.session_state.current_page = "mcq_quiz"
-        st.rerun()
+
     else:
         st.error("Please select a topic first.")
 
