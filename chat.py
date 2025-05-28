@@ -7,6 +7,54 @@ from question_bank import show_question_bank
 from welcome import welcome_page
 from mcq_quiz import display_mcq_quiz
 
+def render_chat_ui():
+    # Display chat messages from history on app rerun
+
+    for message in st.session_state.messages[2:]: #skip system message and first user message which trigger the LLM response
+        if message["role"] != "system": #hide the system message in chat
+            with st.chat_message(message["role"]):
+                st.markdown(message["content"])
+
+    user_input = st.chat_input("Input your message here...")
+    
+    if user_input:
+        # Add user message to chat history
+        st.session_state.messages.append({"role": "user", "content": user_input})
+        # Update message count when user sends a message
+        st.session_state.message_count += 1
+        
+ 
+        with st.chat_message("user"):
+            st.markdown(user_input)        
+        formatted_messages = []
+        for msg in st.session_state.messages:
+            if msg["role"] == "user":
+                formatted_messages.append(("user", msg["content"]))
+            elif msg["role"] == "assistant":
+                formatted_messages.append(("assistant", msg["content"]))
+            elif msg["role"] == "system":
+                formatted_messages.append(("system", msg["content"]))
+
+        print("-- Formatted messages for LLM:")  # Debugging line
+        print(formatted_messages)
+
+        ## try catch BadRequestError: Error code: 400 - {'error': {'message': "The response was filtered due to the prompt triggering Azure OpenAI's content management policy. Please modify your prompt and retry
+        try:
+            # Call LLM to get response
+            response = llm_service.send_message(formatted_messages)
+        except Exception as e:
+            print(f"Error calling LLM: {str(e)}")
+            response = "Sorry, I encountered an error while processing your request. Please try again or provide an another input."
+
+
+
+        st.session_state.messages.append({"role": "assistant", "content": response})
+        with st.chat_message("assistant"):
+            st.markdown(response)
+        
+        update_topic_points(st.session_state.selected_topic_data.get("title", ""))
+        st.rerun()
+
 def get_topics():
     # get topics from sample-data/topics.json
     with open("sample-data/topics_with_q.json") as f:
@@ -35,10 +83,8 @@ if "messages" not in st.session_state:
     st.session_state.messages = []
 
 def start_mcq_panel():
-    """
-    Initialize the MCQ quiz for the selected topic.
-    Prepares the necessary session state variables and transitions to the MCQ quiz page.
-    """
+    st.session_state.mcq_started = True
+
     # Store the current topic's questions in session state
     if "selected_topic_data" in st.session_state and st.session_state.selected_topic_data:
         selected_topic = st.session_state.selected_topic_data
@@ -455,19 +501,19 @@ def main_chat_page():
     top_col1, top_col2, top_col3, top_col5 = st.columns([1, 1, 1, 1])
     
     with top_col3:
-        if st.button("← Home", key="return_home button"):
+        if st.button("🏠 Home", key="return_home button"):
             st.session_state.current_page = "welcome"
             st.rerun()
             
     with top_col2:
         # Add button to toggle Question Bank visibility
-        if st.button("📚 Question Bank", key="toggle_question_bank"):
+        if st.button("🗂️ Question Bank", key="toggle_question_bank"):
             st.session_state.show_question_bank = True
             st.rerun()
             
     with top_col1:
         # Add button to return to chat view
-        if st.button("💬 Chat", key="toggle_chat"):
+        if st.button("📚 Main Page", key="toggle_chat"):
             st.session_state.show_question_bank = False
             st.rerun()
 
@@ -643,58 +689,26 @@ def main_chat_page():
 
         # Create discussion interface - MOVED THIS SECTION TO INSIDE THE OVERVIEW TAB
         with overview_tab:
-            # Display chat interface after the content
-            st.markdown("### Discussion")
             
             col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
             with col1:
                 if "messages" not in st.session_state or len(st.session_state.messages) == 0:
                     start_button = st.button("Start Chat", key="start_discussion_btn", on_click=start_chat)
                 else:
-                    start_button = st.button("Restart Chat", key="continue_discussion_btn", on_click=start_chat)
+                    start_button = st.button("Start Chat", key="continue_discussion_btn", on_click=start_chat)
 
-            with col2:
-                if st.session_state.current_page == "chat_page" and ("messages" not in st.session_state or len(st.session_state.messages) > 0):
-                    start_exercise_button = st.button("Start Practice", key="start_exercise_btn", on_click=start_exercise)
+            #with col2:
+                #if st.session_state.current_page == "chat_page" and ("messages" not in st.session_state or len(st.session_state.messages) > 0):
+                #    start_exercise_button = st.button("Start Practice", key="start_exercise_btn", on_click=start_exercise)
 
-            with col3: 
-                start_mcq_button = st.button("Start MCQ", key="start_mcq_btn", on_click=start_mcq_panel)
+            with col2: 
+                start_mcq_button = st.button("Start Practice", key="start_practice_btn", on_click=start_mcq_panel)
             
             # Show chat messages only in the overview tab
             if st.session_state.current_page == "chat_page" and "messages" in st.session_state and len(st.session_state.messages) > 0:
-                # Display chat messages from history on app rerun
-                for message in st.session_state.messages:
-                    if message["role"] != "system": #hide the system message in chat
-                        with st.chat_message(message["role"]):
-                            st.markdown(message["content"])
-
-                user_input = st.chat_input("Input your message here...")
-                
-                if user_input:
-                    # Add user message to chat history
-                    st.session_state.messages.append({"role": "user", "content": user_input})
-                    # Update message count when user sends a message
-                    st.session_state.message_count += 1
-                    
-                    with st.chat_message("user"):
-                        st.markdown(user_input)        
-                    formatted_messages = []
-                    for msg in st.session_state.messages:
-                        if msg["role"] == "user":
-                            formatted_messages.append(("user", msg["content"]))
-                        elif msg["role"] == "assistant":
-                            formatted_messages.append(("assistant", msg["content"]))
-                        elif msg["role"] == "system":
-                            formatted_messages.append(("system", msg["content"]))
-                                
-                    response = llm_service.send_message(formatted_messages)
-
-                    st.session_state.messages.append({"role": "assistant", "content": response})
-                    with st.chat_message("assistant"):
-                        st.markdown(response)
-                    
-                    update_topic_points(st.session_state.selected_topic_data.get("title", ""))
-                    st.rerun()
+                messages = st.container(height=500)
+                with messages:
+                    render_chat_ui()
 
         # Handle the start exercise button click (KEEP THIS OUTSIDE THE TAB)
         if "start_exercise_clicked" in st.session_state:
@@ -719,7 +733,7 @@ def main_chat_page():
         # Display MCQ quiz if in MCQ mode
         if st.session_state.current_page == "mcq_quiz":
             # Display MCQ quiz
-            display_mcq_quiz(all_topics)
+            display_mcq_quiz(all_topics, render_chat_ui, llm_service)
 
 # Main code - determine which page to show
 if st.session_state.current_page == "welcome":

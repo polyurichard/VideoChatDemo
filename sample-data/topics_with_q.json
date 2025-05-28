@@ -1075,7 +1075,7 @@
     },
     {
       "title": "Model Choice & Training",
-      "required": true,
+      "required": false,
       "start_timestamp": "03:43",
       "end_timestamp": "06:24",
       "summary": "This segment discusses how a model is chosen and trained. A simple linear model is selected for classifying wine versus beer because only two features (color and alcohol percentage) are used. The training process involves initializing random parameters (m and b), making predictions, comparing them to actual outputs, and adjusting these parameters iteratively until the model becomes effective.",
@@ -1426,7 +1426,7 @@
     },
     {
       "title": "Evaluation & Prediction",
-      "required": true,
+      "required": false,
       "start_timestamp": "06:24",
       "end_timestamp": "10:05",
       "summary": "This segment describes the steps following model training, including evaluation and prediction. After training, the model is tested with a separate set of data to assess its performance. The process also involves tuning hyperparameters like learning rate and training steps. Once the model performs satisfactorily, it is used to make predictions—such as determining whether a new drink is wine or beer. These principles can be generalized to other machine learning tasks.",

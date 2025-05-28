@@ -1,12 +1,16 @@
 import streamlit as st
+def return_to_main():
+    st.session_state.current_page = "main_page"
+    
+def display_mcq_quiz(all_topics, render_chat_ui, llm_service=None):
 
-def display_mcq_quiz(all_topics):
+    
     # Check if we need to proceed to the next question (from previous interaction)
     if st.session_state.get("proceed_to_next", False):
         # Clear the flag
         del st.session_state.proceed_to_next
         # Move to next question
-        next_question()
+        next_question(llm_service)
         return
 
     # Get selected topic information
@@ -21,7 +25,7 @@ def display_mcq_quiz(all_topics):
     if "selected_topic_data" in st.session_state:
         all_questions = st.session_state.selected_topic_data.get("questions", [])
         mcq_questions = [q for q in all_questions if q.get("type") == "mcq"]
-        
+
         # Initialize the MCQ state variables if not already set
         if "mcq_questions" not in st.session_state:
             st.session_state.mcq_questions = mcq_questions
@@ -30,6 +34,9 @@ def display_mcq_quiz(all_topics):
             st.session_state.mcq_attempts = {}
             st.session_state.mcq_completed = False
             st.session_state.mcq_correct_answers = 0
+
+
+
     
     # Check if MCQ questions are available
     if not st.session_state.get("mcq_questions", []):
@@ -49,7 +56,20 @@ def display_mcq_quiz(all_topics):
     
     # Get current question index
     current_idx = st.session_state.get("current_question_index", 0)
-    
+
+    # reset message context if this is the first question or if the user has moved to next question    
+    if "mcq_started"  in st.session_state:
+        if  st.session_state.mcq_started == True:
+            # Reset message context on quiz start
+            reset_message_context(llm_service, questions[current_idx])
+            st.session_state.mcq_started = False
+    if "next_question_called" in st.session_state:
+        if st.session_state.next_question_called:
+            # Reset message context when moving to next question
+            reset_message_context(llm_service, questions[current_idx])
+            st.session_state.next_question_called = False
+
+
     # Make sure the index is valid
     if current_idx >= total_questions:
         st.session_state.mcq_completed = True
@@ -58,19 +78,19 @@ def display_mcq_quiz(all_topics):
     
     # Get the current question
     question = questions[current_idx]
+
+
     
     # Create a container for the question
     with st.container():
-        # Display question number and progress
-        st.subheader(f"Question {current_idx + 1} of {total_questions}")
-        
-        # Show progress bar
-        progress = current_idx / total_questions
-        st.progress(progress)
         
         # Display question text
-        col1, col2 = st.columns([2, 1])
+        col1, col2 = st.columns([1, 1])
+
         with col1:
+            # Display question number and progress
+            st.subheader(f"Question {current_idx + 1} of {total_questions}")
+            
             st.markdown(f"**{question.get('question', '')}**")
         
             # Get options
@@ -105,8 +125,8 @@ def display_mcq_quiz(all_topics):
                     hint = question.get('explanation', 'Think carefully about this question.')
                 
                 # Move hint display to col2 instead of col1
-        
-        with col2: # for displaying feedback
+            submit_button = st.button("Submit Answer", key=f"submit_{current_idx}")
+
             # Check if the user has submitted an answer for this question
             if current_idx in st.session_state.get("submitted_answers", {}):
                 submitted_option = st.session_state.submitted_answers[current_idx]
@@ -132,37 +152,48 @@ def display_mcq_quiz(all_topics):
                     # Show hint after incorrect attempt
                     if current_idx in st.session_state.mcq_attempts and len(st.session_state.mcq_attempts[current_idx]) > 0:
                         st.info(f"Hint: {hint}")
+            
+            # Only show navigation buttons if answer is not correct yet
+            is_correct_answer = st.session_state.get("correct_answers_by_question", {}).get(current_idx, False)
+            
+            if not is_correct_answer:
+        
+                if submit_button:
+                    if selected_option is None:
+                        st.warning("Please select an answer before submitting.")
+                    else:
+                        # Store the submitted answer in session state
+                        if "submitted_answers" not in st.session_state:
+                            st.session_state.submitted_answers = {}
+                        
+                        st.session_state.submitted_answers[current_idx] = selected_option
+                        
+                        # Call check_answer to evaluate but without displaying duplicate feedback
+                        check_answer(selected_option, question, display_feedback=False)
+                        
+                        # Force rerun to update the feedback display
+                        st.rerun()
             else:
-                st.write("Submit your answer to see feedback.")
-        
-        # Only show navigation buttons if answer is not correct yet
-        is_correct_answer = st.session_state.get("correct_answers_by_question", {}).get(current_idx, False)
-        
-        if not is_correct_answer:
-    
-            if st.button("Submit Answer", key=f"submit_{current_idx}"):
-                if selected_option is None:
-                    st.warning("Please select an answer before submitting.")
+                # When answer is correct, only show a more prominent continue button
+                st.write("")  # Add some spacing
+                
+                # Check if this is the last question
+                is_last_question = current_idx >= total_questions - 1
+                
+                if is_last_question:
+                    button_text = "Show Results →"
                 else:
-                    # Store the submitted answer in session state
-                    if "submitted_answers" not in st.session_state:
-                        st.session_state.submitted_answers = {}
+                    button_text = "Continue to Next Question →"
                     
-                    st.session_state.submitted_answers[current_idx] = selected_option
-                    
-                    # Call check_answer to evaluate but without displaying duplicate feedback
-                    check_answer(selected_option, question, display_feedback=False)
-                    
-                    # Force rerun to update the feedback display
+                if st.button(button_text, key=f"continue_single_btn_{current_idx}", use_container_width=True):
+                    st.session_state.proceed_to_next = True
                     st.rerun()
-                    
 
-        else:
-            # When answer is correct, only show a more prominent continue button
-            st.write("")  # Add some spacing
-            if st.button("Continue to Next Question →", key=f"continue_single_btn_{current_idx}", use_container_width=True):
-                st.session_state.proceed_to_next = True
-                st.rerun()
+        with col2: # for displaying feedback
+            messages = st.container(height=500)
+            with messages:
+                render_chat_ui()
+                      
 
 def check_answer(selected_option, question, display_feedback=True):
     current_idx = st.session_state.current_question_index
@@ -207,7 +238,8 @@ def check_answer(selected_option, question, display_feedback=True):
             # Rerun to show hint
             st.rerun()
 
-def next_question():
+def next_question(llm_service=None):
+    st.session_state.next_question_called = True
     """
     Advances to the next question or completes the quiz if all questions are answered.
     """
@@ -221,6 +253,11 @@ def next_question():
         st.session_state.mcq_completed = True
         # Make sure completion status is updated
         update_topic_completion()
+    else:
+        # Only try to access the next question if we're not at the end
+        current_question = st.session_state.mcq_questions[st.session_state.current_question_index]
+        # Reset message context for the new question
+        reset_message_context(llm_service, current_question)
     
     # Rerun the app to display the next question or completion screen
     st.rerun()
@@ -290,6 +327,33 @@ def reset_mcq_quiz():
         del st.session_state.proceed_to_next
 
 
+def reset_message_context(llm_service, current_question):
+    
+    # Reset message count
+    st.session_state.message_count = 0
+    st.session_state.messages = []
+    question = current_question
+    # Add system message with the discussion prompt
+    # read system message file prompts/config 3-chat_question.txt
+    with open("prompts/3-chat_question.txt", "r") as f:
+        system_message = f.read().strip()
+    # replace {question} in system_prompt with the actual question
+    system_message = system_message.replace("{question}", str(question))
+    print("question: ", question)
+    # replace { and } with {{ and }}
+    system_message = system_message.replace("{", "{{").replace("}", "}}")
+    msg = [
+        ("system", system_message),
+        ("user", "Let's start")
+    ]
+    response = llm_service.send_message(msg)
+
+    # Clear previous messages and set new context
+    st.session_state.messages = []
+    st.session_state.messages.append({"role": "system", "content": system_message})
+    st.session_state.messages.append({"role": "user", "content": "Let's start"})
+    st.session_state.messages.append({"role": "assistant", "content": response})
+
 def update_topic_score():
     """
     Updates the topic score based on quiz performance.
@@ -297,48 +361,50 @@ def update_topic_score():
     if "selected_topic_data" in st.session_state and st.session_state.selected_topic_data:
         topic_title = st.session_state.selected_topic_data.get("title", "")
         
-        # Calculate points based on number of correct answers
-        if "topic_points" in st.session_state and "topic_total_points" in st.session_state:
-            # Calculate what percentage of the max points should be awarded
-            total_questions = st.session_state.mcq_total_questions
-            correct_answers = st.session_state.mcq_correct_answers
-            
-            # Calculate percentage complete and award proportional points
-            completion_percentage = correct_answers / total_questions if total_questions > 0 else 0
-            total_possible_points = st.session_state.topic_total_points.get(topic_title, 0)
-            points_earned = int(completion_percentage * total_possible_points)
-            
-            # Update points in session state (only if higher than current points)
+        # Get the current question
+        current_idx = st.session_state.current_question_index
+        current_question = st.session_state.mcq_questions[current_idx]
+        
+        # Get point value from the question
+        point_value = current_question.get("point_value", 1)  # Default to 1 if not specified
+        
+        if "topic_points" in st.session_state:
+            # Update points in session state
             current_points = st.session_state.topic_points.get(topic_title, 0)
-            if points_earned > current_points:
-                st.session_state.topic_points[topic_title] = points_earned
+            new_points = current_points + point_value
+            st.session_state.topic_points[topic_title] = new_points
+            print(f"Added {point_value} points to {topic_title}. New total: {new_points}")
 
 def update_topic_completion():
-    """
-    Updates the topic completion status when all questions are answered correctly.
-    """
     if "selected_topic_data" in st.session_state and st.session_state.selected_topic_data:
         topic_title = st.session_state.selected_topic_data.get("title", "")
         
         # If all questions correct, mark topic as completed
         if st.session_state.mcq_correct_answers == st.session_state.mcq_total_questions:
             if "topic_points" in st.session_state and "topic_total_points" in st.session_state:
-                # Award full points
-                st.session_state.topic_points[topic_title] = st.session_state.topic_total_points.get(topic_title, 0)
+                # Check if the topic is already awarded full points to avoid double-counting
+                total_possible_points = st.session_state.topic_total_points.get(topic_title, 0)
+                current_points = st.session_state.topic_points.get(topic_title, 0)
+                
+                # Only award full points if we haven't done so already
+                if current_points < total_possible_points:
+                    # Award points based on correct answers instead of full points
+                    # This ensures we don't accidentally assign more points than intended
+                    print(f"Topic completion: keeping current points at {current_points}")
                 
                 # Check if this is a required topic and update completed topics count
                 if (st.session_state.selected_topic_data.get("required", False) and 
-                    "completed_topics_count" in st.session_state):
+                    "completed_topics_count" in st.session_state and
+                    "topic_core_points" in st.session_state):
+                    
                     # Only increment if this topic wasn't already counted as complete
-                    current_points = st.session_state.topic_points.get(topic_title, 0)
                     core_points = st.session_state.topic_core_points.get(topic_title, 0)
                     
-                    if current_points < core_points:
-                        st.session_state.completed_topics_count += 1
-
-def return_to_main():
-    """
-    Returns to the main page.
-    """
-    st.session_state.current_page = "chat"
-    st.rerun()
+                    # Ensure we don't count this topic as completed if it was already counted
+                    key = f"completed_{topic_title}"
+                    if not st.session_state.get(key, False):
+                        if current_points >= core_points:
+                            st.session_state.completed_topics_count += 1
+                            # Mark this topic as having been counted
+                            st.session_state[key] = True
+                            print(f"Marked topic {topic_title} as completed")
