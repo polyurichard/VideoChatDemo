@@ -723,9 +723,16 @@ def main_chat_page():
                     formatted_messages.append(("assistant", msg["content"]))
                 elif msg["role"] == "system":
                     formatted_messages.append(("system", msg["content"]))
-                    
-            response = llm_service.send_message(formatted_messages)
-            st.session_state.messages.append({"role": "assistant", "content": response})
+
+            # handle exception BadRequestError: Error code: 400 - {'error': {'message': "The response was filtered due to the prompt triggering Azure OpenAI's content management policy. Please modify your prompt and retry. To learn more about our content filtering policies please read our documentation: https://go.microsoft.com/fwlink/?linkid=2198766", 'type': None, 'param': 'prompt', 'code': 'content_filter', 'status': 400, 'innererror': {'code': 'ResponsibleAIPolicyViolation', 'content_filter_result': {'hate': {'filtered': False, 'severity': 'safe'}, 'jailbreak': {'filtered': True, 'detected': True}, 'self_harm': {'filtered': False, 'severity': 'safe'}, 'sexual': {'filtered': False, 'severity': 'safe'}, 'violence': {'filtered': False, 'severity': 'safe'}}}}}
+            try:
+                # Send the formatted messages to the LLM service
+                response = llm_service.send_message(formatted_messages)
+            except BadRequestError as e:
+                st.error("Error: The response was filtered due to content management policies. Please modify your prompt and retry.")
+                return
+                                
+
             # remove the key from session state
             del st.session_state.start_exercise_clicked
             st.rerun()
