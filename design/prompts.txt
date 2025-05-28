@@ -25,3 +25,14 @@ User can select the questions they want to include in the question bank.
 The user can select the core questions that the user should answer in learning activity.
 
 6. Preview the chat based discussion UI with progress bar (similar to the original UI)
+
+---
+when create lesson. step 1: user can choose the esxisting video or pdf which is in the learning activity specific asset store. step3: right panel should be displayed as 2 column. The left column is the questions in the asset store or question generated in each step (2 tabs), user can drag and drop questions to the (or use lef or right arow) to the right column to select that question as the core question that user should attempt. unselected questions are in asset store if it's not removed.
+
+generated question: The answer criteria renamed as "Rubrics", add a field sample answer for each question except personal connection questions.
+
+
+---
+After completing the preview, it will show a sample of report of student activity in the chat. E.g. the questions attempted, strength, weakness, scores. Etc.
+
+Final step: Provide some options for user to configure the learning activity. E.g. the learning activity description in the landing page, deadline, etc. The instructor can edit it.

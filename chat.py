@@ -418,7 +418,7 @@ def main_chat_page():
             max-width: 35%;
         }
         .main .block-container {
-            max-width: 60%;
+            max-width: 70%;
             padding-top: 3rem;
             padding-right: 1rem;
             padding-left: 1rem;
