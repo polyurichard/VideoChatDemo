@@ -5,7 +5,7 @@
       "required": true,
       "start_timestamp": "00:01",
       "end_timestamp": "00:39",
-      "summary": "The video starts by explaining that machine learning gives computers new abilities, like detecting skin cancer or sorting cucumbers. It introduces the idea of a 'model'—a system built to answer questions (e.g., whether a drink is wine or beer)—and the process of 'training' the model to improve its accuracy.",
+      "summary": "The video starts by explaining that machine learning gives computers new abilities, like detecting skin cancer or sorting cucumbers. It introduces the idea of a 'model' - a system built to answer questions (e.g., whether a drink is wine or beer)—and the process of 'training' the model to improve its accuracy.",
       "questions": [
         {
           "type": "open-ended",
@@ -36,6 +36,38 @@
           ],
           "explanation": ""
         },
+{
+          "type": "mcq",
+          "question_nature": "remember",
+          "required": false,
+          "question": "What is the process of creating a model called?",
+          "point_value": 2,
+          "options": [
+            "Evaluation",
+            "Training",
+            "Data Collection",
+            "Prediction"
+          ],
+          "correct_answer": "Training",
+          "reference_text": [
+            {
+              "text": "this model is created via a process called training",
+              "timestamp": "00:39"
+            }
+          ],
+          "answer": [
+            {
+              "criteria": "Selects 'Training' as the process of creating the model",
+              "points": 2
+            }
+          ],
+          "hints": [
+            "Review the explanation provided at 00:39.",
+            "Focus on the term used to describe building the model.",
+            "Remember that training adjusts the model to make accurate predictions."
+          ],
+          "explanation": "The video clearly states that the model is built through a process called training."
+        },        
         {
           "type": "short_question",
           "question_nature": "basic",
@@ -324,38 +356,6 @@
             "Notice that playing chess is not listed among the examples."
           ],
           "explanation": "The video mentions detecting skin cancer, sorting cucumbers, and detecting escalators in need of repair, but it does not mention playing chess."
-        },
-        {
-          "type": "mcq",
-          "question_nature": "remember",
-          "required": false,
-          "question": "What is the process of creating a model called?",
-          "point_value": 2,
-          "options": [
-            "Evaluation",
-            "Training",
-            "Data Collection",
-            "Prediction"
-          ],
-          "correct_answer": "Training",
-          "reference_text": [
-            {
-              "text": "this model is created via a process called training",
-              "timestamp": "00:39"
-            }
-          ],
-          "answer": [
-            {
-              "criteria": "Selects 'Training' as the process of creating the model",
-              "points": 2
-            }
-          ],
-          "hints": [
-            "Review the explanation provided at 00:39.",
-            "Focus on the term used to describe building the model.",
-            "Remember that training adjusts the model to make accurate predictions."
-          ],
-          "explanation": "The video clearly states that the model is built through a process called training."
         }
       ]
     },

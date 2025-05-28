@@ -1,4 +1,7 @@
 import streamlit as st
+import json
+
+
 def return_to_main():
     st.session_state.current_page = "main_page"
     
@@ -21,32 +24,11 @@ def display_mcq_quiz(all_topics, render_chat_ui, llm_service=None):
     topic_title = st.session_state.selected_topic_data.get("title", "Unknown Topic")
     
     
-    # Filter only MCQ questions from the selected topic
-    if "selected_topic_data" in st.session_state:
-        all_questions = st.session_state.selected_topic_data.get("questions", [])
-        mcq_questions = [q for q in all_questions if q.get("type") == "mcq"]
-
-        # Initialize the MCQ state variables if not already set
-        if "mcq_questions" not in st.session_state:
-            st.session_state.mcq_questions = mcq_questions
-            st.session_state.mcq_total_questions = len(mcq_questions)
-            st.session_state.current_question_index = 0
-            st.session_state.mcq_attempts = {}
-            st.session_state.mcq_completed = False
-            st.session_state.mcq_correct_answers = 0
-
-
-
-    
-    # Check if MCQ questions are available
-    if not st.session_state.get("mcq_questions", []):
-        st.warning(f"No MCQ questions available for topic: {topic_title}")
-        if st.button("Return to Main"):
-            return_to_main()
-        return
+  
     
     # Get the questions from session state
-    questions = st.session_state.mcq_questions
+    
+    questions = st.session_state.selected_topic_data["questions"]
     total_questions = len(questions)
     
     # Check if quiz is completed
@@ -63,6 +45,9 @@ def display_mcq_quiz(all_topics, render_chat_ui, llm_service=None):
             # Reset message context on quiz start
             reset_message_context(llm_service, questions[current_idx])
             st.session_state.mcq_started = False
+            # Store the questions and total count in session state for later reference
+            st.session_state.mcq_questions = questions
+            st.session_state.mcq_total_questions = total_questions
     if "next_question_called" in st.session_state:
         if st.session_state.next_question_called:
             # Reset message context when moving to next question
@@ -89,30 +74,51 @@ def display_mcq_quiz(all_topics, render_chat_ui, llm_service=None):
 
         with col1:
             # Display question number and progress
-            st.subheader(f"Question {current_idx + 1} of {total_questions}")
-            
+ 
+            if question["required"]:
+                required = "[Required]"
+            else:
+                required = ""
+
+            st.subheader(f"Question {current_idx + 1} of {total_questions} " + required)
+                        
             st.markdown(f"**{question.get('question', '')}**")
-        
-            # Get options
-            options = question.get("options", [])
-            if not options:
-                st.error("No options available for this question.")
-                if st.button("Skip to Next Question"):
-                    next_question()
-                return
-            
-            # Create a unique key for the radio button based on attempts
-            attempts = len(st.session_state.mcq_attempts.get(current_idx, []))
-            radio_key = f"q{current_idx}_attempt{attempts}"
-            
-            # Display options as radio buttons
-            selected_option = st.radio(
-                "Select your answer:",
-                options,
-                key=radio_key,
-                index=None  # No default selection
-            )
-            
+            st.markdown(f"Point Value: {question.get('point_value', 1)}")
+
+
+
+            if question["type"] == "mcq":
+                # Get options
+                options = question.get("options", [])
+                
+                # Ensure options is a list of strings
+                if isinstance(options, list) and options:
+                    # Create a unique key for the radio button based on attempts
+                    attempts = len(st.session_state.mcq_attempts.get(current_idx, []))
+                    radio_key = f"q{current_idx}_attempt{attempts}"
+
+                    # Display options as radio buttons
+                    selected_option = st.radio(
+                        "Select your answer:",
+                        options,
+                        key=radio_key,
+                        index=None  # No default selection
+                    )
+                    answer_value = selected_option
+                else:
+                    st.error("No options available for this question")
+                    selected_option = None
+                    answer_value = None
+            else : # open-ended question
+                # show a text area 
+                selected_option = st.text_area(
+                    "Your answer:",
+                    key=f"q{current_idx}_text_area",
+                    placeholder="Type your answer here..."
+                )
+                answer_value = selected_option
+
+
             # Show hint if user has already made an incorrect attempt
             if current_idx in st.session_state.mcq_attempts and len(st.session_state.mcq_attempts[current_idx]) > 0:
                 hint_list = question.get('hints', [])
@@ -124,119 +130,148 @@ def display_mcq_quiz(all_topics, render_chat_ui, llm_service=None):
                 else:
                     hint = question.get('explanation', 'Think carefully about this question.')
                 
-                # Move hint display to col2 instead of col1
+            # Move hint display to col2 instead of col1
             submit_button = st.button("Submit Answer", key=f"submit_{current_idx}")
 
-            # Check if the user has submitted an answer for this question
-            if current_idx in st.session_state.get("submitted_answers", {}):
-                submitted_option = st.session_state.submitted_answers[current_idx]
-                is_correct = submitted_option == question.get("correct_answer")
+            # Handle submit button click
+            if submit_button:
+                # Initialize mcq_attempts dict if not exists
+                if "mcq_attempts" not in st.session_state:
+                    st.session_state.mcq_attempts = {}
                 
+                # Initialize attempts list for current question if not exists
+                if current_idx not in st.session_state.mcq_attempts:
+                    st.session_state.mcq_attempts[current_idx] = []
+                
+                # Initialize submitted answers dict if not exists
+                if "submitted_answers" not in st.session_state:
+                    st.session_state.submitted_answers = {}
+                
+                # Only process if an answer was selected/entered
+                if answer_value:
+                    # Record this attempt
+                    st.session_state.mcq_attempts[current_idx].append(answer_value)
+                    
+                    # Store the submitted answer
+                    st.session_state.submitted_answers[current_idx] = answer_value
+                    
+                    # Force rerun to display evaluation results
+                    st.rerun()
+                else:
+                    st.error("Please select or enter an answer before submitting.")
+
+            # Check if the user has submitted an answer for this question
+            feedback = ""
+            if current_idx in st.session_state.get("submitted_answers", {}):
+                # if type is mcq, evaluate the answer
+                if question["type"] == "mcq":
+                    submitted_option = st.session_state.submitted_answers[current_idx]
+                    is_correct = evaluate_mcq_answer(submitted_option, question, llm_service)
+                else:
+                    submitted_answer = st.session_state.submitted_answers[current_idx]
+                    is_correct, score, feedback = evaluate_answer(submitted_answer, question, llm_service)
+                    print("is_correct: ", is_correct)
+                    print("feedback: ", feedback)
+                    # For open-ended questions, use the evaluate_answer function
+                
+
                 # Store whether the answer is correct in session state
                 if "correct_answers_by_question" not in st.session_state:
                     st.session_state.correct_answers_by_question = {}
                 st.session_state.correct_answers_by_question[current_idx] = is_correct
                 
-                if is_correct:
-                    st.success("✅ Correct! Well done!")
-                    
-                    # Show explanation if available
-                    explanation = question.get("explanation", "")
-                    if explanation:
-                        st.info(f"Explanation: {explanation}")
-                    
-
-                else:
-                    st.error("❌ That's incorrect. Please try again.")
-                    
-                    # Show hint after incorrect attempt
-                    if current_idx in st.session_state.mcq_attempts and len(st.session_state.mcq_attempts[current_idx]) > 0:
-                        st.info(f"Hint: {hint}")
-            
-            # Only show navigation buttons if answer is not correct yet
-            is_correct_answer = st.session_state.get("correct_answers_by_question", {}).get(current_idx, False)
-            
-            if not is_correct_answer:
-        
-                if submit_button:
-                    if selected_option is None:
-                        st.warning("Please select an answer before submitting.")
+                if question["type"] == "mcq":
+                        
+                    if is_correct:
+                        st.success("✅ Correct! Well done!")
+                        
+                        # Show explanation if available
+                        explanation = question.get("explanation", "")
+                        if explanation:
+                            st.info(f"Explanation: {explanation}")
                     else:
-                        # Store the submitted answer in session state
-                        if "submitted_answers" not in st.session_state:
-                            st.session_state.submitted_answers = {}
-                        
-                        st.session_state.submitted_answers[current_idx] = selected_option
-                        
-                        # Call check_answer to evaluate but without displaying duplicate feedback
-                        check_answer(selected_option, question, display_feedback=False)
-                        
-                        # Force rerun to update the feedback display
-                        st.rerun()
-            else:
-                # When answer is correct, only show a more prominent continue button
-                st.write("")  # Add some spacing
-                
-                # Check if this is the last question
-                is_last_question = current_idx >= total_questions - 1
-                
-                if is_last_question:
-                    button_text = "Show Results →"
+                        st.error("❌ That's incorrect. Please try again.")                 
+                        # Show hint after incorrect attempt
+                        if current_idx in st.session_state.mcq_attempts and len(st.session_state.mcq_attempts[current_idx]) > 0:
+                            st.info(f"Hint: {hint}")
                 else:
-                    button_text = "Continue to Next Question →"
-                    
-                if st.button(button_text, key=f"continue_single_btn_{current_idx}", use_container_width=True):
-                    st.session_state.proceed_to_next = True
-                    st.rerun()
-
+                    st.write("Score: " + str(score))
+                    if is_correct:
+                        st.success("✅ Correct! Well done!")
+                        st.write("Feedback: " + feedback)
+                    else:
+                        st.error(f"Feedback: {feedback}")
+                        # Show hint after incorrect attempt
+                        #if current_idx in st.session_state.mcq_attempts and len(st.session_state.mcq_attempts[current_idx]) > 0:
+                        #    st.info(f"Hint: {hint}")
+                
+                # Add Next Question button after an answer has been submitted and evaluated
+                if current_idx == total_questions - 1:
+                    if st.button("Finish Quiz", key="finish_quiz"):
+                        st.session_state.mcq_completed = True
+                        st.rerun()
+ 
         with col2: # for displaying feedback
             messages = st.container(height=500)
             with messages:
                 render_chat_ui()
-                      
-
-def check_answer(selected_option, question, display_feedback=True):
-    current_idx = st.session_state.current_question_index
-    correct_answer = question.get("correct_answer")
-    
-    # Create a two-column layout for the question and feedback
-    col1, col2 = st.columns([3, 2])
-    
-    with col1:
-        # Left column - show the question again for context
-        st.markdown(f"**{question.get('question', '')}**")
-        st.write(f"Your answer: {selected_option}")
-    
-    with col2:
-        # Right column - show the feedback
-        if selected_option == correct_answer:
-            # Answer is correct
-            st.success("✅ Correct! Well done!")
             
-            # Increment correct answers count
-            st.session_state.mcq_correct_answers += 1
-            
-            # Update topic points
-            update_topic_score()
-            
-            # Show explanation if available
-            explanation = question.get("explanation", "")
-            if explanation:
-                st.info(f"Explanation: {explanation}")
-            
-            
-        else:
-            # Answer is incorrect
-            st.error("❌ That's incorrect. Please try again.")
-            
-            # Track this attempt
-            if current_idx not in st.session_state.mcq_attempts:
-                st.session_state.mcq_attempts[current_idx] = []
-            
-            st.session_state.mcq_attempts[current_idx].append(selected_option)
-            
-            # Rerun to show hint
+        # Remove the duplicate Next Question button
+        # This button is already defined within the submitted answers condition above
+        
+        # Always show a skip/next button at the bottom to allow progression without answering
+        st.markdown("---")
+        if st.button("Next Question", key=f"skip_{current_idx}"):
+            st.session_state.proceed_to_next = True
             st.rerun()
+
+def evaluate_mcq_answer(selected_option, question, llm_service):
+    is_correct = selected_option == question.get("correct_answer")
+    return is_correct  # Return the boolean result
+    
+
+# evaluate answer by LLM
+def evaluate_answer(input, question, llm_service):
+    print("question: ", question["question"])
+    print("answer:", question["answer"])
+    point_value = question["point_value"]
+    print("point_value: ", point_value)
+
+
+    # read prompt from ./prompts/answer_evaluate.txt
+    with open("./prompts/answer_evaluate.txt", "r") as f:
+        prompt = f.read()
+    prompt = prompt.replace("{question}", question["question"])
+    prompt = prompt.replace("{answer}", str(question["answer"]))
+    prompt = prompt.replace("{input}", input)
+    prompt = prompt.replace("{", "{{").replace("}", "}}")
+    print("prompt: ", prompt)
+
+    msg = [
+        ("user", prompt)
+    ]
+    response = llm_service.send_message(msg)
+    print("-- response json ---")
+    print(response)    
+    # convert response from string to json
+    try:
+        response_json = json.loads(response)
+
+        score = response_json["score"]
+        feedback = response_json["feedback"]
+    except ValueError:
+        st.error("Error parsing response from LLM. Please try again.")
+        return False, 0, "Error"
+
+
+    if score >= point_value:
+        # If score is greater than or equal to point value, consider it correct
+        return True, score, feedback
+    else:
+        return False, score, feedback
+
+
+
 
 def next_question(llm_service=None):
     st.session_state.next_question_called = True
@@ -247,7 +282,14 @@ def next_question(llm_service=None):
     st.session_state.current_question_index += 1
     
     # Check if this was the last question
-    total_questions = len(st.session_state.mcq_questions)
+    # Use mcq_questions from session state if available, otherwise fall back to selected_topic_data
+    if "mcq_questions" in st.session_state:
+        total_questions = len(st.session_state.mcq_questions)
+    elif "selected_topic_data" in st.session_state:
+        total_questions = len(st.session_state.selected_topic_data["questions"])
+    else:
+        total_questions = 0
+        
     if st.session_state.current_question_index >= total_questions:
         # Set completed flag and update any completion metrics
         st.session_state.mcq_completed = True
@@ -255,7 +297,10 @@ def next_question(llm_service=None):
         update_topic_completion()
     else:
         # Only try to access the next question if we're not at the end
-        current_question = st.session_state.mcq_questions[st.session_state.current_question_index]
+        if "mcq_questions" in st.session_state:
+            current_question = st.session_state.mcq_questions[st.session_state.current_question_index]
+        else:
+            current_question = st.session_state.selected_topic_data["questions"][st.session_state.current_question_index]
         # Reset message context for the new question
         reset_message_context(llm_service, current_question)
     
@@ -266,7 +311,7 @@ def show_completion_screen():
     """
     Displays the quiz completion screen with results and options.
     """
-    st.success("🎉 Congratulations! You've completed the quiz!")
+    # st.success("🎉 Congratulations! You've completed the quiz!")
     
     # Display score
     total_questions = st.session_state.mcq_total_questions
@@ -346,7 +391,8 @@ def reset_message_context(llm_service, current_question):
         ("system", system_message),
         ("user", "Let's start")
     ]
-    response = llm_service.send_message(msg)
+    #response = llm_service.send_message(msg)
+    response = "I'm here to help you with the question about technology that learns from data, like recommendation systems on streaming services. I can guide you through understanding how such technologies work and help you reflect on your personal experience with them. \n\n To begin, have you noticed any specific technology or service that seems to learn from your preferences or behavior?"
 
     # Clear previous messages and set new context
     st.session_state.messages = []
