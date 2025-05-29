@@ -3,6 +3,7 @@ import json
 
 def submit_answer(current_idx, selected_option, question, llm_service):
     st.session_state.current_action = "submit_answer"
+    st.session_state.user_answer = selected_option
     st.session_state.submit_answer = True
 
     # Initialize necessary session state variables if they don't exist yet
@@ -52,6 +53,7 @@ def submit_answer(current_idx, selected_option, question, llm_service):
         st.session_state.messages.append({"role": "user", "content": f"My answer: {selected_option}"})
         st.session_state.messages.append({"role": "assistant", "content": feedback})
     else:
+        print("Open-ended question input ansewr: ", selected_option)
         is_correct, score, feedback = evaluate_answer(selected_option, question, llm_service, current_idx)
         # For open-ended questions, the evaluate_answer function already adds messages to chat
     
