@@ -690,7 +690,7 @@ def main_chat_page():
                 #    start_exercise_button = st.button("Start Practice", key="start_exercise_btn", on_click=start_exercise)
 
             with col2: 
-                start_mcq_button = st.button("Start Practice", key="start_practice_btn", on_click=start_mcq_panel)
+                start_mcq_button = st.button("Practice", key="start_practice_btn", on_click=start_mcq_panel)
             
             # Show chat messages only in the overview tab
             if st.session_state.current_page == "chat_page" and "messages" in st.session_state and len(st.session_state.messages) > 0:
