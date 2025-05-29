@@ -742,7 +742,7 @@ if st.session_state.current_page == "welcome":
 else:
     # change to wide mode
 
-    if "user_answer" in st.session_state:
-        st.write(f"User answer: {st.session_state.user_answer}")  # Debugging line
+    #if "user_answer" in st.session_state:
+    #    st.write(f"User answer: {st.session_state.user_answer}")  # Debugging line
     
     main_chat_page()

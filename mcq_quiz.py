@@ -195,7 +195,7 @@ def display_mcq_quiz(all_topics, render_chat_ui, llm_service=None):
                     hint = question.get('explanation', 'Think carefully about this question.')
                 
             # Move hint display to col2 instead of col1
-            submit_button = st.button("Submit Answer", key=f"submit_{current_idx}", on_click=submit_answer, args=(current_idx, answer_value, question, llm_service))
+            submit_button = st.button("Submit Answer", key=f"submit_{current_idx}", on_click=submit_answer, args=(current_idx, st.session_state[f"q{current_idx}_text_area"], question, llm_service))
 
             if "submit_answer" in st.session_state and st.session_state.submit_answer:
                 st.write("Answer submitted!")
