@@ -11,7 +11,7 @@
           "type": "open-ended",
           "question_nature": "personal_experience",
           "required": true,
-          "question": "Have you ever noticed a technology that learns from data (like recommendations on streaming services)? Describe your experience and how you think it works.",
+          "question": "Have you ever noticed a technology that learns from data (like recommendations on streaming services)? Describe your experience with the technology.",
           "point_value": 2,
           "reference_text": [
             {
@@ -39,7 +39,7 @@
 {
           "type": "mcq",
           "question_nature": "remember",
-          "required": false,
+          "required": true,
           "question": "What is the process of creating a model called?",
           "point_value": 2,
           "options": [

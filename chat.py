@@ -7,6 +7,12 @@ from question_bank import show_question_bank
 from welcome import welcome_page
 from mcq_quiz import display_mcq_quiz
 
+st.set_page_config(layout="wide")
+
+# init states
+st.session_state.current_action = ""
+
+
 def render_chat_ui():
     # Display chat messages from history on app rerun
 
@@ -203,16 +209,14 @@ def get_discussion_prompt():
                         if "text" in ref and "timestamp" in ref:
                             reference_texts.append(f"({ref['timestamp']}) {ref['text']}")
         
+        # the selected topic data
         selected_topic_data = {
             "title": first_topic["title"],
             "required": first_topic.get("required", False),
-            "learning_objectives": first_topic.get("learning_objectives", []),
             "summary": first_topic.get("summary", ""),
             "start_timestamp": first_topic.get("start_timestamp", ""),
             "end_timestamp": first_topic.get("end_timestamp", ""),
-            "detailed_content": first_topic.get("detailed_content", []),
             "questions": first_topic.get("questions", []),
-            "transcript": transcript_text,
             "reference_texts": reference_texts  # Add extracted reference texts
         }
     
@@ -271,9 +275,6 @@ def update_topic_points(topic_title):
     # Get up to last 4 messages (or fewer if not available)
     context_messages = visible_messages[-4:] if len(visible_messages) >= 4 else visible_messages
     
-    print(f"---- Using {len(context_messages)} messages for evaluation:")  # Debugging line
-    print(context_messages)  # Debugging line
-    
     # Format the conversation for the LLM evaluation in a plain text format
     formatted_conversation = ""
     for msg in context_messages:
@@ -290,10 +291,6 @@ def update_topic_points(topic_title):
         print(f"Error reading score update prompt: {str(e)}")
         return
     
-    # print score_prompt for debugging
-    print("---- Score update prompt:")  # Debugging line
-    print(score_prompt)  # Debugging line
-
     # Call LLM to evaluate the conversation and determine points
     evaluation = llm_service.send_message([("user", score_prompt)])
     print("---- LLM evaluation response:")  # Debugging line
@@ -343,30 +340,35 @@ def update_topic_points(topic_title):
         points_earned = 0
     
     # Update the points in the session state
-    if "topic_points" in st.session_state:
+    if "topic_points" in st.session_state and points_earned > 0:
+        # Get current points for this topic
         current_points = st.session_state.topic_points.get(topic_title, 0)
-        st.session_state.topic_points[topic_title] = min(
-            current_points + points_earned, 
-            st.session_state.topic_total_points.get(topic_title, 100)  # Cap at max points
-        )
         
-        # Check if this is a core topic and if all core questions are answered
-        new_points = st.session_state.topic_points[topic_title]
+        # Add new points earned to the current total
+        new_points = current_points + points_earned
+        
+        # Cap at the maximum possible points for this topic
+        max_points = st.session_state.topic_total_points.get(topic_title, 100)
+        new_points = min(new_points, max_points)
+        
+        # Update the points in session state
+        st.session_state.topic_points[topic_title] = new_points
+        
+        # Check if this topic is newly completed
         core_points = st.session_state.topic_core_points.get(topic_title, 0)
         is_required = st.session_state.selected_topic_data.get("required", False)
         
-        # Topic is completed if it's earned at least as many points as core questions are worth
-        if is_required and current_points < core_points and new_points >= core_points:
-            # This core topic just became completed
+        # Track if this update newly completes the topic
+        key = f"completed_{topic_title}"
+        previously_completed = st.session_state.get(key, False)
+        newly_completed = is_required and not previously_completed and new_points >= core_points
+        
+        if newly_completed:
+            st.session_state[key] = True
             st.session_state.completed_topics_count += 1
+            print(f"Topic {topic_title} newly completed! Points: {new_points}/{core_points}")
         
-        print(f"Updated points for {topic_title}: {new_points}/{st.session_state.topic_core_points.get(topic_title, 0)} (core) - {st.session_state.topic_total_points.get(topic_title, 100)} (total)")
-        
-        # Fix: Use st.session_state.core_topics instead of core_topics
-        if "core_topics" in st.session_state:
-            print(f"Completed core topics: {st.session_state.completed_topics_count}/{len(st.session_state.core_topics)}")
-        else:
-            print(f"Completed core topics: {st.session_state.completed_topics_count}/unknown")
+        print(f"Updated points for {topic_title}: {new_points}/{core_points} (core) - {max_points} (total)")
 
 
 
@@ -463,13 +465,7 @@ def main_chat_page():
             min-width: 35%;
             max-width: 35%;
         }
-        .main .block-container {
-            max-width: 70%;
-            padding-top: 3rem;
-            padding-right: 1rem;
-            padding-left: 1rem;
-            padding-bottom: 1rem;
-        }
+
     </style>
     """, unsafe_allow_html=True)
 
@@ -588,9 +584,11 @@ def main_chat_page():
                     st.rerun()  # Refresh to start video
                 
                 if st.session_state.selected_topic_data.get("summary"):
-                    st.markdown("### Topic Summary")
-                    # Display summary in info box
-                    st.info(st.session_state.selected_topic_data.get("summary"))
+                    col1, col2 = st.columns([3, 2])
+                    with col1:
+                        st.markdown("### Topic Summary")
+                        # Display summary in info box
+                        st.info(st.session_state.selected_topic_data.get("summary"))
                 
                 if st.session_state.selected_topic_data.get("detailed_content"):
                     st.markdown("### Detailed Content")
@@ -613,77 +611,67 @@ def main_chat_page():
                     st.markdown("### Topic Questions")
                     questions = st.session_state.selected_topic_data.get("questions", [])
                     
-                    # Group questions by nature for better organization
-                    question_by_nature = {}
-                    for q in questions:
-                        nature = q.get("question_nature", "Other")
-                        if nature not in question_by_nature:
-                            question_by_nature[nature] = []
-                        question_by_nature[nature].append(q)
+                    # Display questions in numerical order
+                    st.markdown(f"## Questions ({len(questions)})")
                     
-                    # Display questions by nature directly without expanders
-                    for nature, q_list in question_by_nature.items():
-                        st.markdown(f"## {nature.title()} Questions ({len(q_list)})")
+                    for idx, q in enumerate(questions):
+                        # Create two columns for question and answer
+                        q_col, a_col = st.columns([2, 3])
                         
-                        for idx, q in enumerate(q_list):
-                            # Create two columns for question and answer
-                            q_col, a_col = st.columns([2, 3])
+                        with q_col:
+                            # Add badge to show if question is required
+                            required_badge = "🔴 Required" if q.get("required", False) else "⚪ Optional"
+                            st.markdown(f"**Q{idx+1}: {q.get('question')}** <span style='color: {'red' if q.get('required', False) else 'gray'}; font-size: 0.8em;'>{required_badge}</span>", unsafe_allow_html=True)
                             
-                            with q_col:
-                                # Add badge to show if question is required
-                                required_badge = "🔴 Required" if q.get("required", False) else "⚪ Optional"
-                                st.markdown(f"**Q{idx+1}: {q.get('question')}** <span style='color: {'red' if q.get('required', False) else 'gray'}; font-size: 0.8em;'>{required_badge}</span>", unsafe_allow_html=True)
-                                
-                                # Display MCQ options if question is MCQ type
-                                if q.get("type") == "mcq":
-                                    options = q.get("options", [])
-                                    correct_answer = q.get("correct_answer", "")
-                                    st.markdown("**Options:**")
-                                    for i, option in enumerate(options):
-                                        is_correct = option == correct_answer
-                                        # Use a checkmark for the correct answer
-                                        option_marker = "✅" if is_correct else f"{i+1}."
-                                        st.markdown(f"{option_marker} {option}")
+                            # Display MCQ options if question is MCQ type
+                            if q.get("type") == "mcq":
+                                options = q.get("options", [])
+                                correct_answer = q.get("correct_answer", "")
+                                st.markdown("**Options:**")
+                                for i, option in enumerate(options):
+                                    is_correct = option == correct_answer
+                                    # Use a checkmark for the correct answer
+                                    option_marker = "✅" if is_correct else f"{i+1}."
+                                    st.markdown(f"{option_marker} {option}")
+                        
+                        with a_col:
                             
-                            with a_col:
-                                
-                                # Handle different answer formats based on question type
-                                if q.get("type") == "mcq":
-                                    st.markdown(f"**Correct Answer:** {q.get('correct_answer', '')}")
-                                    if q.get("explanation"):
-                                        st.markdown(f"**Explanation:** {q.get('explanation')}")
-                                elif q.get("type") == "short_question":
-                                    # Properly handle short_question answers
-                                    if isinstance(q.get("answer"), list):
-                                        st.markdown("**Grading Criteria:**")
-                                        for criterion in q.get("answer", []):
-                                            st.markdown(f"- {criterion.get('criteria', '')}: {criterion.get('points', 0)} points")
-                                    else:
-                                        st.markdown(f"**Answer:** {q.get('answer', '')}")
-                                elif isinstance(q.get("answer"), list):
-                                    # Ensure list-type answers are displayed as grading criteria
+                            # Handle different answer formats based on question type
+                            if q.get("type") == "mcq":
+                                st.markdown(f"**Correct Answer:** {q.get('correct_answer', '')}")
+                                if q.get("explanation"):
+                                    st.markdown(f"**Explanation:** {q.get('explanation')}")
+                            elif q.get("type") == "short_question":
+                                # Properly handle short_question answers
+                                if isinstance(q.get("answer"), list):
                                     st.markdown("**Grading Criteria:**")
                                     for criterion in q.get("answer", []):
                                         st.markdown(f"- {criterion.get('criteria', '')}: {criterion.get('points', 0)} points")
                                 else:
-                                    # Handle any other formats
                                     st.markdown(f"**Answer:** {q.get('answer', '')}")
-                                
-                                # Always display hints for all question types
-                                if q.get("hints"):
-                                    st.markdown("**Hints:**")
-                                    for i, hint in enumerate(q.get("hints", [])):
-                                        st.markdown(f"- **Hint {i+1}:** {hint}")
-                                
-                                # Display reference texts if available
-                                if q.get("reference_text"):
-                                    st.markdown("**Reference Text:**")
-                                    for ref in q.get("reference_text", []):
-                                        st.markdown(f"- **({ref.get('timestamp', '')})** {ref.get('text', '')}")
+                            elif isinstance(q.get("answer"), list):
+                                # Ensure list-type answers are displayed as grading criteria
+                                st.markdown("**Grading Criteria:**")
+                                for criterion in q.get("answer", []):
+                                    st.markdown(f"- {criterion.get('criteria', '')}: {criterion.get('points', 0)} points")
+                            else:
+                                # Handle any other formats
+                                st.markdown(f"**Answer:** {q.get('answer', '')}")
+                            
+                            # Always display hints for all question types
+                            if q.get("hints"):
+                                st.markdown("**Hints:**")
+                                for i, hint in enumerate(q.get("hints", [])):
+                                    st.markdown(f"- **Hint {i+1}:** {hint}")
+                            
+                            # Display reference texts if available
+                            if q.get("reference_text"):
+                                st.markdown("**Reference Text:**")
+                                for ref in q.get("reference_text", []):
+                                    st.markdown(f"- **({ref.get('timestamp', '')})** {ref.get('text', '')}")
 
-                        # Add extra spacing between question categories
-                        if nature != list(question_by_nature.keys())[-1]:
-                            st.markdown("<br><br>", unsafe_allow_html=True)
+                        # Add spacing between questions
+                        st.markdown("<br>", unsafe_allow_html=True)
                 else:
                     st.info("No questions available for this topic.")
 
@@ -706,9 +694,11 @@ def main_chat_page():
             
             # Show chat messages only in the overview tab
             if st.session_state.current_page == "chat_page" and "messages" in st.session_state and len(st.session_state.messages) > 0:
-                messages = st.container(height=500)
-                with messages:
-                    render_chat_ui()
+                col1, col2 = st.columns([3, 2])
+                with col1:
+                    messages = st.container(height=500)
+                    with messages:
+                        render_chat_ui()
 
         # Handle the start exercise button click (KEEP THIS OUTSIDE THE TAB)
         if "start_exercise_clicked" in st.session_state:
@@ -742,8 +732,15 @@ def main_chat_page():
             # Display MCQ quiz
             display_mcq_quiz(all_topics, render_chat_ui, llm_service)
 
-# Main code - determine which page to show
+
+# determine which page to show
 if st.session_state.current_page == "welcome":
-    welcome_page()
+    col1, col2, col3 = st.columns([1, 1, 1])
+    with col2:
+        
+        welcome_page()
 else:
+    # change to wide mode
+
+
     main_chat_page()

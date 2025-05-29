@@ -21,8 +21,8 @@ def store_topic_data(topic_title, extract_transcript, get_discussion_prompt):
         del st.session_state.mcq_attempts
     if "submitted_answers" in st.session_state:
         del st.session_state.submitted_answers
-    if "correct_answers_by_question" in st.session_state:
-        del st.session_state.correct_answers_by_question
+    if "question_scores" in st.session_state:
+        del st.session_state.question_scores
     if "mcq_completed" in st.session_state:
         del st.session_state.mcq_completed
     if "mcq_correct_answers" in st.session_state:
@@ -65,6 +65,11 @@ def store_topic_data(topic_title, extract_transcript, get_discussion_prompt):
             
             # Generate discussion prompt for the selected topic
             st.session_state.discussion_prompt = get_discussion_prompt()
+            
+            # Reset any existing completion status for this topic
+            completion_key = f"completed_{topic_title}"
+            if completion_key in st.session_state:
+                del st.session_state[completion_key]
             
             # reset conversation history
             st.session_state.messages = []
